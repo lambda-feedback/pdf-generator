@@ -8,6 +8,6 @@ export const handler = async function (event: APIGatewayEvent, context: Context)
   console.log('Processing event: %s', JSON.stringify(event, null, 2));
   return {
     statusCode: 200,
-    url: 'myURL'
+    body: 'Hello from pdf lambda!'
   }
 };
