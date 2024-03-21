@@ -18,8 +18,8 @@ jobs:
       - name: Build
         run: yarn build
 
-      # - name: Move node_modules to dist
-      #  run: mv node_modules dist/node_modules
+      - name: Move node_modules to dist
+        run: mv node_modules dist/node_modules
 
       - name: Zip
         run: (cd dist && zip -r ../deploy.zip .)
