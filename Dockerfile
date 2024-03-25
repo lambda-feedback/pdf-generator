@@ -6,4 +6,4 @@ COPY . .
 
 RUN npm install
 
-CMD [ "npm", "run", "TestWithReportGeneration" ]
+CMD [ "npm", "run" ]
