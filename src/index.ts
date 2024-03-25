@@ -1,8 +1,6 @@
 
 import { APIGatewayEvent, Context } from 'aws-lambda';
 
-console.log('Hello from PDF Generator. This is a test')
-
 export const handler = async function (event: APIGatewayEvent, context: Context) {
   console.error('Lambda function handler called')
   const queries = 
