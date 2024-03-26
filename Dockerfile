@@ -4,7 +4,7 @@ FROM  node:16.14.0 as builder
 WORKDIR /usr/src/app
 
 # Install app dependencies
-COPY package.json yarn.lock ./
+COPY package.json ./
 
 RUN yarn install --frozen-lockfile
 
