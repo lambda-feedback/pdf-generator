@@ -17,6 +17,7 @@ FROM node:slim
 ENV NODE_ENV production
 USER node
 
-COPY --from=builder /usr/src/app/dist/index.js ./dist/index.js
+COPY --from=builder /usr/src/app/dist ./dist
 
+EXPOSE 8080
 CMD [ "node", "dist/index.js" ]
