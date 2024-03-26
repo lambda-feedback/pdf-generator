@@ -32,6 +32,7 @@ jobs:
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
       - name: Excho image
         env:
@@ -43,4 +44,6 @@ jobs:
         env:
           IMAGE_URI: ${{ steps.build-custom-image.outputs.image }}
         run: |
-          aws lambda update-function-code --function-name arn:aws:lambda:eu-west-2:172805473475:function:lambda-feedback-prod-pdf-set-generator --image-uri $IMAGE_URI
+          aws lambda update-function-code \
+            --function-name arn:aws:lambda:eu-west-2:172805473475:function:lambda-feedback-prod-pdf-set-generator 
+            --image-uri 172805473475.dkr.ecr.eu-west-2.amazonaws.com/lambda-feedback-prod-pdf-set-generator:latest
