@@ -4,6 +4,8 @@ WORKDIR /app
 
 COPY . .
 
-RUN npm install
+COPY dist/*.js ./
 
-CMD [ "npm", "run" ]
+RUN yarn install
+
+CMD [ "index.handler" ]
