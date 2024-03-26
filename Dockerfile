@@ -12,6 +12,11 @@ COPY . .
 
 RUN yarn build
 
+FROM node:slim
+
+ENV NODE_ENV production
+USER node
+
 COPY --from=builder /usr/src/app/dist ./dist
 
 CMD [ "node", "dist/index.js" ]
