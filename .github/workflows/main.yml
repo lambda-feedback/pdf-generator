@@ -32,13 +32,7 @@ jobs:
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-
-      - name: Excho image
-        env:
-          IMAGE_URI: ${{ steps.build-custom-image.outputs.image }}
-        run: |
-          echo: "::set-output name=image::$IMAGE_URI"
+          echo "{image}={$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG}" >> $GITHUB_OUTPUT
 
       - name: Update aws custom lambda function code
         env:
