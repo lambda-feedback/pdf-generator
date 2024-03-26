@@ -12,6 +12,6 @@ COPY . .
 
 RUN yarn build
 
-COPY ./dist .
+COPY --from=builder /usr/src/app/dist ./dist
 
-CMD [ "index.js" ]
+CMD [ "node", "dist/index.js" ]
