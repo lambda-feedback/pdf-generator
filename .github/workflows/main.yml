@@ -36,7 +36,8 @@ jobs:
       - name: Excho image
         env:
           IMAGE_URI: ${{ steps.build-custom-image.outputs.image }}
-        echo: "::set-output name=image::$IMAGE_URI"
+        run: |
+          echo: "::set-output name=image::$IMAGE_URI"
 
       - name: Update aws custom lambda function code
         env:
