@@ -6,12 +6,13 @@
   "scripts": {
     "test:types": "tsc",
     "test": "yarn test:types",
-    "build": "tsc --incremental false"
+    "build": "esbuild index.ts --bundle --minify --sourcemap --platform=node --target=es2020 --outfile=dist/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "@types/aws-lambda": "^8.10.136"
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.136",
+    "esbuild": "^0.20.2"
   }
 }
