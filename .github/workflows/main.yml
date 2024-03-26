@@ -36,5 +36,5 @@ jobs:
       - name: Update aws custom lambda function code
         env:
           IMAGE_URI: ${{ steps.build-custom-image.outputs.image}}
-          run: |
-            aws lambda update-function-code --function-name arn:aws:lambda:eu-west-2:172805473475:function:lambda-feedback-prod-pdf-set-generator --image-uri $IMAGE_URI
+        run: |
+          aws lambda update-function-code --function-name arn:aws:lambda:eu-west-2:172805473475:function:lambda-feedback-prod-pdf-set-generator --image-uri $IMAGE_URI
