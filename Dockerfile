@@ -12,6 +12,8 @@ COPY . .
 
 RUN yarn build
 
+FROM node:slim
+
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 
