@@ -34,7 +34,7 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
       - name: Excho image
-        echo: "::set-output name=image::${{ steps.build-custom-image.outputs.image }}"
+        echo: ${{ steps.build-custom-image.outputs.image }}
 
       - name: Update aws custom lambda function code
         env:
