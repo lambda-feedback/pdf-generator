@@ -12,6 +12,6 @@ COPY . .
 
 RUN yarn build
 
-COPY /usr/src/app/dist ./dist
+COPY ./dist .
 
-CMD [ "dist/index.js" ]
+CMD [ "index.js" ]
