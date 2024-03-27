@@ -39,5 +39,5 @@ jobs:
           IMAGE_URI: ${{ steps.build-custom-image.outputs.image }}
         run: |
           aws lambda update-function-code \
-              --function-name arn:aws:lambda:eu-west-2:172805473475:function:lambda-feedback-prod-pdf-set-generator \
+              --function-name lambda-feedback-prod-pdf-set-generator \
               --image-uri 172805473475.dkr.ecr.eu-west-2.amazonaws.com/lambda-feedback-prod-pdf-set-generator:latest
