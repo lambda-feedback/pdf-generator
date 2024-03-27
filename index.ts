@@ -7,7 +7,7 @@ export const handler = async function (event: APIGatewayEvent, context: Context)
   return {
     statusCode: 200,
     body: JSON.stringify({
-      message: 'what a lovely day there',
+      message: 'what a lovely day there, is not it?',
     })
   }
 };
