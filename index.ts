@@ -7,7 +7,7 @@ export const handler = async function (event: APIGatewayEvent, context: Context)
   return {
     statusCode: 200,
     body: JSON.stringify({
-      message: 'hello from pdf-generator lambda',
+      message: 'what a lovely day',
     })
   }
 };
