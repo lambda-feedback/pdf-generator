@@ -40,4 +40,4 @@ jobs:
         run: |
           aws lambda update-function-code \
               --function-name lambda-feedback-prod-pdf-set-generator \
-              --image-uri 172805473475.dkr.ecr.eu-west-2.amazonaws.com/lambda-feedback-prod-pdf-set-generator:latest
+              --image-uri $IMAGE_URI:latest
