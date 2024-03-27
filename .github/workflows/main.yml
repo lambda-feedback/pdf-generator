@@ -37,7 +37,10 @@ jobs:
       - name: Update aws custom lambda function code
         env:
           IMAGE_URI: ${{ steps.build-custom-image.outputs.image }}
+          ECR_REGISTRY: ${{ steps.login-pf-aws-ecr.outputs.registry }}
+          ECR_REPOSITORY: lambda-feedback-prod-pdf-set-generator
+          IMAGE_TAG: latest
         run: |
           aws lambda update-function-code \
               --function-name lambda-feedback-prod-pdf-set-generator \
-              --image-uri ${{ steps.build-custom-image.outputs.image }}
+              --image-uri $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
