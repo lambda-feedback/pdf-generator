@@ -1,6 +1,10 @@
 FROM public.ecr.aws/lambda/nodejs:16 as builder
 WORKDIR /usr/app
 COPY package.json index.ts ./
+
+RUN apt update
+RUN apt install -y pandoc
+
 RUN npm install
 RUN npm run build
     
