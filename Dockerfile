@@ -10,6 +10,8 @@ RUN curl -fsSL https://github.com/jgm/pandoc/releases/download/3.1.13/pandoc-3.1
   && mv /tmp/pandoc-3.1.13/bin/pandoc /usr/bin \
   && rm -rf /tmp/pandoc.tar.gz /tmp/pandoc-3.1.13
 
+RUN /usr/bin/pandoc --help
+
 RUN chmod +x /usr/bin/pandoc
 
 # Copy package.json and install dependencies
@@ -27,6 +29,7 @@ FROM public.ecr.aws/lambda/nodejs:16
 # Copy built files from previous stage
 WORKDIR ${LAMBDA_TASK_ROOT}
 COPY --from=builder /usr/app/dist/* ./
+COPY --from=builder /usr/bin/pandoc /usr/bin/pandoc
 
 # Set the Lambda function handler
 CMD ["index.handler"]
