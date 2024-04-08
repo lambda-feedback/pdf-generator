@@ -11,11 +11,11 @@ export const SetSchema = z.object({
 });
 
 export const handler = async function (event: APIGatewayEvent, context: Context): Promise<APIGatewayProxyResult> {
-  
+  console.log("I am starting, your handler")
   const message = JSON.parse(JSON.stringify(event));
   console.log('Processing this event:', message);
 
-  const s3Client = new S3();
+  //const s3Client = new S3();
   
   //const humanSetNumber = set.number + 1;
   const humanSetNumber = 1;
