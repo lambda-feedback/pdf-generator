@@ -58,6 +58,7 @@ export const handler = async function (event: APIGatewayEvent, context: Context)
     */
 
     // ************ check ***************
+    /*
     const ls = spawn('ls', ['-lh', 'usr']);
 
     ls.stdout.on('data', (data) => {
@@ -71,7 +72,7 @@ export const handler = async function (event: APIGatewayEvent, context: Context)
     ls.on('close', (code) => {
       console.log(`child process exited with code ${code}`);
     });
-
+*/
     // **********************************
 
     const inputString = '# Heading\n\nThis is some **bold** text.';
