@@ -5,10 +5,10 @@ FROM public.ecr.aws/lambda/nodejs:16 as builder
 RUN yum install -y tar gzip
 
 # Download and install Pandoc
-RUN curl -fsSL https://github.com/jgm/pandoc/releases/download/2.16/pandoc-2.16-linux-amd64.tar.gz -o /tmp/pandoc.tar.gz \
+RUN curl -fsSL https://github.com/jgm/pandoc/releases/download/3.1.13/pandoc-3.1.13-linux-amd64.tar.gz -o /tmp/pandoc.tar.gz \
   && tar -xzf /tmp/pandoc.tar.gz -C /tmp \
-  && mv /tmp/pandoc-2.16/bin/pandoc /usr/bin \
-  && rm -rf /tmp/pandoc.tar.gz /tmp/pandoc-2.16
+  && mv /tmp/pandoc-3.1.13/bin/pandoc /usr/bin \
+  && rm -rf /tmp/pandoc.tar.gz /tmp/pandoc-3.1.13
 
 RUN chmod +x /usr/bin/pandoc
 

@@ -57,12 +57,36 @@ export const handler = async function (event: APIGatewayEvent, context: Context)
     });
     */
 
+    // ************ check ***************
+    const ls = spawn('ls', ['-lh', 'usr']);
+
+    ls.stdout.on('data', (data) => {
+      console.log(`stdout: ${data}`);
+    });
+    
+    ls.stderr.on('data', (data) => {
+      console.error(`stderr: ${data}`);
+    });
+    
+    ls.on('close', (code) => {
+      console.log(`child process exited with code ${code}`);
+    });
+
+    // **********************************
+
     const inputString = '# Heading\n\nThis is some **bold** text.';
     const outputFilePath = 'output.pdf';
 
 
     // Define Pandoc command and arguments
     //const pandocCommand = 'pandoc';
+    if(fs.existsSync('/usr/bin/pandoc')){
+      console.log('Path exists')
+    }
+    else{
+      // Below code to create the folder, if its not there
+      console.log('Path does not exists')
+    }
     const pandocCommand = '/usr/bin/pandoc';
     const pandocArgs = [
       '--from=markdown',  // Specify input format as Markdown
