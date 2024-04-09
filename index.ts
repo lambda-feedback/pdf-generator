@@ -1,4 +1,4 @@
-import { APIGatewayEvent, Context, APIGatewayProxyResult } from 'aws-lambda';
+import { APIGatewayEvent, Context, APIGatewayProxyResult, Callback } from 'aws-lambda';
 import {spawn } from 'child_process';
 import * as z from 'zod';
 import * as fs from 'fs';
@@ -10,7 +10,7 @@ export const SetSchema = z.object({
   apiKey: z.string(),
 });
 
-export const handler = async function (event: APIGatewayEvent, context: Context): Promise<APIGatewayProxyResult> {
+export const handler = async function (event: APIGatewayEvent, context: Context, callback: Callback): Promise<APIGatewayProxyResult> {
   console.log("I am starting, your handler")
   const message = JSON.parse(JSON.stringify(event));
   console.log('Processing this event:', message);
@@ -39,17 +39,16 @@ export const handler = async function (event: APIGatewayEvent, context: Context)
   const s3Path = `test/${filename}`;
   let url: string | undefined;
 
-  try {
-    console.log('step 0')
-    /*
-    const pdfString = await pdcTs.Execute({
-      //from: 'markdown-implicit_figures', // pandoc source format (disabling the implicit_figures extension to remove all image captions)
-      from: 'markdown',
-      to: 'latex', // pandoc output format
-      pandocArgs: [
-        '--pdf-engine=xelatex',
-        `--template=./template.latex`,
-      ],
+  console.log('step 0')
+  /*
+  const pdfString = await pdcTs.Execute({
+    //from: 'markdown-implicit_figures', // pandoc source format (disabling the implicit_figures extension to remove all image captions)
+    from: 'markdown',
+    to: 'latex', // pandoc output format
+    pandocArgs: [
+      '--pdf-engine=xelatex',
+      `--template=./template.latex`,
+    ],
  //     spawnOpts: { argv0: '+RTS -M512M -RTS' },
       outputToFile: false, // Controls whether the output will be returned as a string or written to a file
       sourceText: markdown, // Use this if your input is a string. If you set this, the file input will be ignored
@@ -117,11 +116,17 @@ export const handler = async function (event: APIGatewayEvent, context: Context)
             console.log('Pandoc process exited successfully');
             if(fs.existsSync('output.pdf')){
               console.log('Output file exists')
-              const fileData = fs.readFileSync("output.pdf")
-              console.log('file content:', fileData)
+              //const fileData = fs.readFileSync("output.pdf")
+              //console.log('file content:', fileData)
+              callback(null, {
+                statusCode: 200,
+                body: JSON.stringify({
+                  message: 'what a lovely day there, is not it?',
+                })});
             }
         } else {
             console.error(`Pandoc process exited with code ${code}`);
+            callback(null, {statusCode: 500, body:'PDF not generated' });
         }
     });
 /*
@@ -141,38 +146,5 @@ export const handler = async function (event: APIGatewayEvent, context: Context)
     
     console.log('step 4')
 */
-  } catch (e: unknown) {
-    if (e instanceof Error) {
-      console.error(e.message);
-    } else {
-      console.error('something went wrong generating the pdf');
-      console.error(e);
-    }
-    /*
-    const TeXoutput = await pdcTs.Execute({
-      from: 'markdown-implicit_figures', // pandoc source format (disabling the implicit_figures extension to remove all image captions)
-      to: 'latex', // pandoc output format
-      pandocArgs: [
-        '--pdf-engine=xelatex',
-        `--template=./template.latex`,
-      ],
-      outputToFile: false, // Controls whether the output will be returned as a string or written to a file
-      sourceText: markdown, // Use this if your input is a string. If you set this, the file input will be ignored
-      destFilePath: localPath,
-    });
-    */
-    // Find the offending text from the error message:
-    //e = errorRefiner(String(e), TeXoutput, false);
-    throw e;
-  } finally {
-    // cleanup
-    //fs.rm(localPath, noop);
-  }
   
-  return {
-    statusCode: 200,
-    body: JSON.stringify({
-      message: 'what a lovely day there, is not it?',
-    })
-  }
 };
