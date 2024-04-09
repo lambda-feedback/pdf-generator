@@ -26,6 +26,12 @@ RUN npm run build
 # Stage 2: Final image
 FROM public.ecr.aws/lambda/nodejs:16
 
+# Install Latex environment and dependencies
+RUN yum install -y texlive-collection-latexrecommended.noarch texlive-iftex.noarch
+
+# This fixes weird format not found issue, not sure how it works
+RUN texconfig rehash
+
 # Copy built files from previous stage
 WORKDIR ${LAMBDA_TASK_ROOT}
 COPY --from=builder /usr/app/dist/* ./

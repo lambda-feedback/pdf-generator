@@ -1,5 +1,5 @@
 import { APIGatewayEvent, Context, APIGatewayProxyResult } from 'aws-lambda';
-import { spawn } from 'child_process';
+import {spawn } from 'child_process';
 import * as z from 'zod';
 import * as fs from 'fs';
 import { S3 } from 'aws-sdk';
@@ -75,7 +75,6 @@ export const handler = async function (event: APIGatewayEvent, context: Context)
 */
     // **********************************
 
-    const inputString = '# Heading\n\nThis is some **bold** text.';
     const outputFilePath = 'output.pdf';
 
 
@@ -99,6 +98,7 @@ export const handler = async function (event: APIGatewayEvent, context: Context)
     const pandocProcess = spawn(pandocCommand, pandocArgs);
     console.log('step 2')
     // Write input string to stdin
+    const inputString = '# Heading\n\nThis is some **bold** text.';
     pandocProcess.stdin.write(inputString);
     pandocProcess.stdin.end();  // Close stdin to indicate end of input
     console.log('step 3')
@@ -115,6 +115,11 @@ export const handler = async function (event: APIGatewayEvent, context: Context)
     pandocProcess.on('close', (code) => {
         if (code === 0) {
             console.log('Pandoc process exited successfully');
+            if(fs.existsSync('output.pdf')){
+              console.log('Output file exists')
+              const fileData = fs.readFileSync("output.pdf")
+              console.log('file content:', fileData)
+            }
         } else {
             console.error(`Pandoc process exited with code ${code}`);
         }
