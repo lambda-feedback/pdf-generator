@@ -87,10 +87,7 @@ export const handler = async function (
     const TeXoutput = await pdcTs.Execute({
       from: "markdown-implicit_figures", // pandoc source format (disabling the implicit_figures extension to remove all image captions)
       to: "latex", // pandoc output format
-      pandocArgs: [
-        "--pdf-engine=xelatex",
-        `--template=../../../../../app/src/pdf/template.latex`,
-      ],
+      pandocArgs: ["--pdf-engine=xelatex", `--template=./template.latex`],
       outputToFile: false, // Controls whether the output will be returned as a string or written to a file
       sourceText: markdown, // Use this if your input is a string. If you set this, the file input will be ignored
       destFilePath: localPath,
