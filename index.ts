@@ -138,7 +138,7 @@ await this.pdcTs.Execute({
           }
 */
           console.log("url:", url);
-
+          deleteFile(localPath);
           callback(null, {
             statusCode: 200,
             body: JSON.stringify({
@@ -161,6 +161,8 @@ const deleteFile = async (filePath: string) => {
     fs.rm(filePath, (error) => {
       if (error) {
         console.error("Cannot delete the temperorary file. Error:", error);
+      } else {
+        console.log("file: " + filePath + " deleted");
       }
     });
   } catch (exception) {
