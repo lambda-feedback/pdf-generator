@@ -45,5 +45,7 @@ COPY --from=builder /usr/app/dist/* ./
 COPY --from=builder /usr/bin/pandoc /usr/bin/pandoc
 COPY --from=builder /usr/app/template.latex template.latex
 
+RUN chmod +x /usr/bin/pandoc
+
 # Set the Lambda function handler
 CMD ["index.handler"]
