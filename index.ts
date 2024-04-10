@@ -43,61 +43,25 @@ export const handler = async function (
     .slice(0, 14)}.pdf`; // Note: set name not a slug so not used.
 
   //const localPath = `src/pdf/${filename}`;
-  const localPath = `./${filename}`;
+  const localPath = `/tmp/${filename}`;
   //const s3Path = `${user.id}/${filename}`;
   const s3Path = `test/${filename}`;
   let url: string | undefined;
 
   console.log("step 0");
-  /*
-  const pdfString = await pdcTs.Execute({
-    //from: 'markdown-implicit_figures', // pandoc source format (disabling the implicit_figures extension to remove all image captions)
-    from: 'markdown',
-    to: 'latex', // pandoc output format
-    pandocArgs: [
-      '--pdf-engine=xelatex',
-      `--template=./template.latex`,
-    ],
- //     spawnOpts: { argv0: '+RTS -M512M -RTS' },
-      outputToFile: false, // Controls whether the output will be returned as a string or written to a file
-      sourceText: markdown, // Use this if your input is a string. If you set this, the file input will be ignored
- //     destFilePath: localPath,
-    });
-    */
-
-  // ************ check ***************
-  /*
-    const ls = spawn('ls', ['-lh', 'usr']);
-
-    ls.stdout.on('data', (data) => {
-      console.log(`stdout: ${data}`);
-    });
-    
-    ls.stderr.on('data', (data) => {
-      console.error(`stderr: ${data}`);
-    });
-    
-    ls.on('close', (code) => {
-      console.log(`child process exited with code ${code}`);
-    });
-*/
-  // **********************************
-
-  const outputFilePath = "/tmp/output.pdf";
 
   // Define Pandoc command and arguments
-  //const pandocCommand = 'pandoc';
   if (fs.existsSync("/usr/bin/pandoc")) {
     console.log("Path exists");
   } else {
-    // Below code to create the folder, if its not there
+    // FIXME: RETURN 500 error here!!!!
     console.log("Path does not exists");
   }
   const pandocCommand = "/usr/bin/pandoc";
   const pandocArgs = [
     "--from=markdown", // Specify input format as Markdown
     "-o",
-    outputFilePath,
+    localPath,
     "-",
   ]; // Use '-' to indicate reading from stdin
   console.log("step 1");
@@ -123,12 +87,11 @@ export const handler = async function (
     pandocProcess.on("close", (code) => {
       if (code === 0) {
         console.log("Pandoc PDF file generated successfully");
-        if (fs.existsSync("/tmp/output.pdf")) {
+        if (fs.existsSync(localPath)) {
           console.log("Output PDF file exists");
           //const fileData = fs.readFileSync("output.pdf")
           //console.log('file content:', fileData)
-          //deleteFile(localPath);
-          deleteAllFilesInDir();
+          deleteFile(localPath);
           callback(null, {
             statusCode: 200,
             body: JSON.stringify({
@@ -175,17 +138,3 @@ const deleteFile = async (filePath: string) => {
     console.error("Cannot delete the temperorary file. Exception:", exception);
   }
 };
-
-async function deleteAllFilesInDir() {
-  try {
-    const files = await fs.readdir("/tmp", (error, files) => {
-      files.forEach((file) => {
-        if (file.substring(file.length - 3) === "pdf") {
-          deleteFile("/tmp/" + file);
-        }
-      });
-    });
-  } catch (err) {
-    console.log(err);
-  }
-}
