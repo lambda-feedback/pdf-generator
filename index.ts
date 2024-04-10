@@ -122,11 +122,13 @@ export const handler = async function (
     console.log("step 5");
     pandocProcess.on("close", (code) => {
       if (code === 0) {
-        console.log("Pandoc process exited successfully");
+        console.log("Pandoc PDF file generated successfully");
         if (fs.existsSync("/tmp/output.pdf")) {
-          console.log("Output file exists");
+          console.log("Output PDF file exists");
           //const fileData = fs.readFileSync("output.pdf")
           //console.log('file content:', fileData)
+          //deleteFile(localPath);
+          deleteAllFilesInDir();
           callback(null, {
             statusCode: 200,
             body: JSON.stringify({
@@ -136,6 +138,7 @@ export const handler = async function (
         }
       } else {
         console.error(`Pandoc process exited with code ${code}`);
+        deleteFile(localPath);
         callback(null, { statusCode: 500, body: "PDF not generated" });
       }
     });
@@ -158,3 +161,31 @@ export const handler = async function (
     console.log('step 4')
 */
 };
+
+const deleteFile = async (filePath: string) => {
+  try {
+    fs.rm(filePath, (error) => {
+      if (error) {
+        console.error("Cannot delete the temperorary file. Error:", error);
+      } else {
+        console.log("file: " + filePath + " deleted");
+      }
+    });
+  } catch (exception) {
+    console.error("Cannot delete the temperorary file. Exception:", exception);
+  }
+};
+
+async function deleteAllFilesInDir() {
+  try {
+    const files = await fs.readdir("/tmp", (error, files) => {
+      files.forEach((file) => {
+        if (file.substring(file.length - 3) === "pdf") {
+          deleteFile("/tmp/" + file);
+        }
+      });
+    });
+  } catch (err) {
+    console.log(err);
+  }
+}
