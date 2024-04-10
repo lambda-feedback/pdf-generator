@@ -8,6 +8,7 @@ import { spawn } from "child_process";
 import * as z from "zod";
 import * as fs from "fs";
 import { S3 } from "aws-sdk";
+import { PdcTs } from "pdc-ts";
 
 export const SetSchema = z.object({
   functionName: z.string(),
@@ -17,8 +18,7 @@ export const SetSchema = z.object({
 
 export const handler = async function (
   event: APIGatewayEvent,
-  context: Context,
-  callback: Callback
+  context: Context
 ): Promise<APIGatewayProxyResult> {
   console.log("I am starting, your handler");
   const message = JSON.parse(JSON.stringify(event));
@@ -49,7 +49,7 @@ export const handler = async function (
   let url: string | undefined;
 
   console.log("step 0");
-
+  const pdcTs = new PdcTs();
   // Define Pandoc command and arguments
   if (fs.existsSync("/usr/bin/pandoc")) {
     console.log("Path exists");
@@ -65,6 +65,52 @@ export const handler = async function (
     "-",
   ]; // Use '-' to indicate reading from stdin
   console.log("step 1");
+
+  const markdown = "# Heading\n\nThis is some **bold** text.";
+  try {
+    await pdcTs.Execute({
+      from: "markdown-implicit_figures", // pandoc source format (disabling the implicit_figures extension to remove all image captions)
+      to: "latex", // pandoc output format
+      pandocArgs: ["--pdf-engine=xelatex", `--template=./template.latex`],
+      spawnOpts: { argv0: "+RTS -M512M -RTS" },
+      outputToFile: true, // Controls whether the output will be returned as a string or written to a file
+      sourceText: markdown, // Use this if your input is a string. If you set this, the file input will be ignored
+      destFilePath: localPath,
+    });
+  } catch (e: unknown) {
+    if (e instanceof Error) {
+      console.error(e.message);
+    } else {
+      console.error("something went wrong generating the pdf");
+      console.error(e);
+    }
+    const TeXoutput = await pdcTs.Execute({
+      from: "markdown-implicit_figures", // pandoc source format (disabling the implicit_figures extension to remove all image captions)
+      to: "latex", // pandoc output format
+      pandocArgs: [
+        "--pdf-engine=xelatex",
+        `--template=../../../../../app/src/pdf/template.latex`,
+      ],
+      outputToFile: false, // Controls whether the output will be returned as a string or written to a file
+      sourceText: markdown, // Use this if your input is a string. If you set this, the file input will be ignored
+      destFilePath: localPath,
+    });
+    // Find the offending text from the error message:
+    // TODO: add errorRefiner
+    //e = errorRefiner(String(e), TeXoutput, false);
+    throw e;
+  } finally {
+    // cleanup
+    deleteFile(localPath);
+  }
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify({
+      message: "what a lovely day there, is not it?",
+    }),
+  };
+  /*
   return new Promise(function (resolve, reject) {
     // Execute Pandoc command
     const pandocProcess = spawn(pandocCommand, pandocArgs);

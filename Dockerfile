@@ -21,13 +21,20 @@ RUN npm install
 
 # Copy and build TypeScript code
 COPY index.ts .
+COPY template.latex template.latex
 RUN npm run build
 
 # Stage 2: Final image
 FROM public.ecr.aws/lambda/nodejs:16
 
 # Install Latex environment and dependencies
-RUN yum install -y texlive-collection-latexrecommended.noarch texlive-iftex.noarch
+RUN yum install -y \
+  texlive-collection-latexrecommended.noarch \
+  texlive-iftex.noarch \
+  texlive-xetex-bin-svn26912.0-38.20130427_r30134.amzn2.0.5.aarch64 \
+  texlive-mathspec-svn15878.0.2-38.amzn2.0.5.noarch \
+  texlive-euenc.noarch \
+  texlive-xetex-def.noarch 
 
 # This fixes weird format not found issue, not sure how it works
 RUN texconfig rehash
@@ -36,6 +43,7 @@ RUN texconfig rehash
 WORKDIR ${LAMBDA_TASK_ROOT}
 COPY --from=builder /usr/app/dist/* ./
 COPY --from=builder /usr/bin/pandoc /usr/bin/pandoc
+COPY --from=builder /usr/app/template.latex template.latex
 
 # Set the Lambda function handler
 CMD ["index.handler"]
