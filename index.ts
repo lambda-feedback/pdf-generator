@@ -93,6 +93,7 @@ export const handler = async function (event: APIGatewayEvent, context: Context,
       outputFilePath,
       '-'];  // Use '-' to indicate reading from stdin
     console.log('step 1')
+    return new Promise(function (resolve, reject) {
     // Execute Pandoc command
     const pandocProcess = spawn(pandocCommand, pandocArgs);
     console.log('step 2')
@@ -129,6 +130,7 @@ export const handler = async function (event: APIGatewayEvent, context: Context,
             callback(null, {statusCode: 500, body:'PDF not generated' });
         }
     });
+  });
 /*
     
     const fileStream = fs.createReadStream(localPath);
