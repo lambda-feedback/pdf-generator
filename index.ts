@@ -74,7 +74,7 @@ export const handler = async function (event: APIGatewayEvent, context: Context,
 */
     // **********************************
 
-    const outputFilePath = 'output.pdf';
+    const outputFilePath = '/tmp/output.pdf';
 
 
     // Define Pandoc command and arguments
@@ -115,7 +115,7 @@ export const handler = async function (event: APIGatewayEvent, context: Context,
     pandocProcess.on('close', (code) => {
         if (code === 0) {
             console.log('Pandoc process exited successfully');
-            if(fs.existsSync('output.pdf')){
+            if(fs.existsSync('/tmp/output.pdf')){
               console.log('Output file exists')
               //const fileData = fs.readFileSync("output.pdf")
               //console.log('file content:', fileData)
