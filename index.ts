@@ -111,9 +111,9 @@ await this.pdcTs.Execute({
           console.log("Output file exists");
           //const fileData = fs.readFileSync("output.pdf")
           //console.log('file content:', fileData)
-
+          /*
           const fileStream = fs.createReadStream(localPath);
-          console.log("step 2");
+          console.log("step S3 upload");
           try {
             await s3Client
               .upload({
@@ -136,7 +136,7 @@ await this.pdcTs.Execute({
               }),
             });
           }
-
+*/
           console.log("url:", url);
 
           callback(null, {
