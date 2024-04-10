@@ -66,7 +66,8 @@ export const handler = async function (
   ]; // Use '-' to indicate reading from stdin
   console.log("step 1");
 
-  const markdown = "# Heading\n\nThis is some **bold** text.";
+  //const markdown = "# Heading\n\nThis is some **bold** text.";
+  const markdown = "Very simple text";
   try {
     await pdcTs.Execute({
       from: "markdown-implicit_figures", // pandoc source format (disabling the implicit_figures extension to remove all image captions)
