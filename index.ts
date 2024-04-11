@@ -7,7 +7,7 @@ import {
 import { spawn } from "child_process";
 import * as z from "zod";
 import * as fs from "fs";
-import { S3 } from "aws-sdk";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { PdcTs } from "pdc-ts";
 
 export const SetSchema = z.object({
@@ -23,8 +23,6 @@ export const handler = async function (
   console.log("I am starting, your handler");
   const message = JSON.parse(JSON.stringify(event));
   console.log("Processing this event:", message);
-
-  const s3Client = new S3();
 
   //const humanSetNumber = set.number + 1;
   const humanSetNumber = 1;
@@ -88,17 +86,17 @@ export const handler = async function (
       console.log("Output PDF file does NOT exist");
     }
     const fileStream = fs.createReadStream(localPath);
-    console.log("step 2");
-    await s3Client
-      .upload({
-        // Bucket: this.configurationService.PUBLIC_S3_BUCKET,
-        Bucket: "lambda-feedback-staging-frontend-client-bucket",
-        Key: s3Path,
-        Body: fileStream,
-      })
-      .promise();
+    console.log("starting file upload to s3", { s3Path });
+    const s3Client = new S3Client({ region: "eu-west-2" });
+    const params = {
+      Bucket: "lambda-feedback-staging-frontend-client-bucket",
+      Key: s3Path,
+      Body: fileStream,
+    };
+    const command = new PutObjectCommand(params);
+    const response = await s3Client.send(command);
 
-    console.log("step 3");
+    console.log("S3 Upload response:", { response });
     //url = `https://${this.configurationService.PUBLIC_S3_BUCKET}.s3.${this.configurationService.PUBLIC_S3_BUCKET_REGION}.amazonaws.com/${s3Path}`;
     url = `https://lambda-feedback-staging-frontend-client-bucket.s3.eu-west-2.amazonaws.com/${s3Path}`;
     console.log("url:", url);
