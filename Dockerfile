@@ -30,12 +30,7 @@ FROM public.ecr.aws/lambda/nodejs:16
 # Install Latex environment and dependencies
 RUN yum install -y \
   texlive-collection-latexrecommended.noarch \
-  texlive-iftex.noarch \
-  texlive-collection-xetex.noarch \
-  texlive-mathspec-svn15878.0.2-38.amzn2.0.5.noarch \
-  texlive-euenc.noarch \
-  texlive-xetex-def.noarch \
-  texlive-xetex-bin-svn26912.0-38.20130427_r30134.amzn2.0.5.aarch64
+  texlive-iftex.noarch
 
 # This fixes weird format not found issue, not sure how it works
 RUN texconfig rehash
