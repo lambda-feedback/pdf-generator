@@ -70,10 +70,11 @@ export const handler = async function (
   const markdown = "Very simple text";
   try {
     await pdcTs.Execute({
-      from: "markdown-implicit_figures", // pandoc source format (disabling the implicit_figures extension to remove all image captions)
+      //     from: "markdown-implicit_figures", // pandoc source format (disabling the implicit_figures extension to remove all image captions)
+      from: "markdown",
       to: "latex", // pandoc output format
-      pandocArgs: ["--pdf-engine=xelatex", `--template=./template.latex`],
-      spawnOpts: { argv0: "+RTS -M512M -RTS" },
+      //   pandocArgs: ["--pdf-engine=xelatex", `--template=./template.latex`],
+      //   spawnOpts: { argv0: "+RTS -M512M -RTS" },
       outputToFile: true, // Controls whether the output will be returned as a string or written to a file
       sourceText: markdown, // Use this if your input is a string. If you set this, the file input will be ignored
       destFilePath: localPath,
@@ -85,6 +86,7 @@ export const handler = async function (
       console.error("something went wrong generating the pdf");
       console.error(e);
     }
+    /*
     const TeXoutput = await pdcTs.Execute({
       from: "markdown-implicit_figures", // pandoc source format (disabling the implicit_figures extension to remove all image captions)
       to: "latex", // pandoc output format
@@ -93,6 +95,7 @@ export const handler = async function (
       sourceText: markdown, // Use this if your input is a string. If you set this, the file input will be ignored
       destFilePath: localPath,
     });
+    */
     // Find the offending text from the error message:
     // TODO: add errorRefiner
     //e = errorRefiner(String(e), TeXoutput, false);
