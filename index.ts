@@ -24,7 +24,7 @@ export const handler = async function (
   const message = JSON.parse(JSON.stringify(event));
   console.log("Processing this event:", message);
 
-  //const s3Client = new S3();
+  const s3Client = new S3();
 
   //const humanSetNumber = set.number + 1;
   const humanSetNumber = 1;
@@ -87,6 +87,22 @@ export const handler = async function (
     } else {
       console.log("Output PDF file does NOT exist");
     }
+    const fileStream = fs.createReadStream(localPath);
+    console.log("step 2");
+    await s3Client
+      .upload({
+        // Bucket: this.configurationService.PUBLIC_S3_BUCKET,
+        Bucket: "lambda-feedback-staging-frontend-client-bucket",
+        Key: s3Path,
+        Body: fileStream,
+      })
+      .promise();
+
+    console.log("step 3");
+    //url = `https://${this.configurationService.PUBLIC_S3_BUCKET}.s3.${this.configurationService.PUBLIC_S3_BUCKET_REGION}.amazonaws.com/${s3Path}`;
+    url = `https://lambda-feedback-staging-frontend-client-bucket.s3.eu-west-2.amazonaws.com/${s3Path}`;
+    console.log("url:", url);
+    console.log("step 4");
   } catch (e: unknown) {
     console.log("Exception throwned");
     if (e instanceof Error) {
@@ -163,22 +179,6 @@ export const handler = async function (
       }
     });
   });
-  /*
-    
-    const fileStream = fs.createReadStream(localPath);
-    console.log('step 2')
-    await s3Client.upload({
-      // Bucket: this.configurationService.PUBLIC_S3_BUCKET,
-      Bucket: 'lambda-feedback-staging-frontend-client-bucket',
-      Key: s3Path,
-      Body: fileStream,
-    }).promise();
-      
-    console.log('step 3')
-    //url = `https://${this.configurationService.PUBLIC_S3_BUCKET}.s3.${this.configurationService.PUBLIC_S3_BUCKET_REGION}.amazonaws.com/${s3Path}`;
-    url = `https://lambda-feedback-staging-frontend-client-bucket.s3.eu-west-2.amazonaws.com/${s3Path}`;
-    
-    console.log('step 4')
 */
 };
 
