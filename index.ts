@@ -79,7 +79,16 @@ export const handler = async function (
       sourceText: markdown, // Use this if your input is a string. If you set this, the file input will be ignored
       destFilePath: localPath,
     });
+    if (fs.existsSync(localPath)) {
+      console.log("Output PDF file exists");
+      //const fileData = fs.readFileSync("output.pdf")
+      //console.log('file content:', fileData)
+      //deleteFile(localPath);
+    } else {
+      console.log("Output PDF file does NOT exist");
+    }
   } catch (e: unknown) {
+    console.log("Exception throwned");
     if (e instanceof Error) {
       console.error(e.message);
     } else {
@@ -102,6 +111,7 @@ export const handler = async function (
     throw e;
   } finally {
     // cleanup
+    console.log("Calling deleteFile");
     deleteFile(localPath);
   }
 
@@ -172,7 +182,8 @@ export const handler = async function (
 */
 };
 
-const deleteFile = async (filePath: string) => {
+const deleteFile = (filePath: string) => {
+  console.log("Delete file here");
   try {
     fs.rm(filePath, (error) => {
       if (error) {
