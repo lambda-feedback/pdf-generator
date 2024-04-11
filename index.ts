@@ -193,6 +193,6 @@ const deleteFile = (filePath: string) => {
       }
     });
   } catch (exception) {
-    console.error("Cannot delete the temperorary file. Exception:", exception);
+    console.error("Cannot delete temporary file.");
   }
 };
