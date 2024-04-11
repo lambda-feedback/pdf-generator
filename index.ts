@@ -73,8 +73,8 @@ export const handler = async function (
       //     from: "markdown-implicit_figures", // pandoc source format (disabling the implicit_figures extension to remove all image captions)
       from: "markdown",
       to: "latex", // pandoc output format
-      //   pandocArgs: ["--pdf-engine=xelatex", `--template=./template.latex`],
-      //   spawnOpts: { argv0: "+RTS -M512M -RTS" },
+      pandocArgs: ["--pdf-engine=xelatex", `--template=./template.latex`],
+      spawnOpts: { argv0: "+RTS -M512M -RTS" },
       outputToFile: true, // Controls whether the output will be returned as a string or written to a file
       sourceText: markdown, // Use this if your input is a string. If you set this, the file input will be ignored
       destFilePath: localPath,
