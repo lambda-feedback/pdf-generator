@@ -21,7 +21,7 @@ export const handler = async function (
   context: Context
 ): Promise<APIGatewayProxyResult> {
   console.log("I am starting, your PDF generator");
-  const requestData: RequestData = JSON.parse(JSON.stringify(event));
+  const requestData: RequestData = JSON.parse(JSON.stringify(event.body));
   console.log("Processing this request:", requestData);
 
   //const humanSetNumber = set.number + 1;
