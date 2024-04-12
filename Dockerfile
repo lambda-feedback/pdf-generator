@@ -38,6 +38,7 @@ RUN texconfig rehash
 WORKDIR ${LAMBDA_TASK_ROOT}
 COPY --from=builder /usr/app/dist/* ./
 COPY --from=builder /usr/bin/pandoc /usr/bin/pandoc
+COPY --from=builder /usr/app/template.latex template.latex
 
 RUN chmod +x /usr/bin/pandoc
 
