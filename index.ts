@@ -1,10 +1,4 @@
-import {
-  APIGatewayEvent,
-  Context,
-  APIGatewayProxyResult,
-  Callback,
-} from "aws-lambda";
-import { spawn } from "child_process";
+import { APIGatewayEvent, Context, APIGatewayProxyResult } from "aws-lambda";
 import * as z from "zod";
 import * as fs from "fs";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
@@ -20,7 +14,7 @@ export const handler = async function (
   event: APIGatewayEvent,
   context: Context
 ): Promise<APIGatewayProxyResult> {
-  console.log("I am starting, your handler");
+  console.log("I am starting, your PDF generator");
   const message = JSON.parse(JSON.stringify(event));
   console.log("Processing this event:", message);
 
@@ -46,23 +40,7 @@ export const handler = async function (
   const s3Path = `test/${filename}`;
   let url: string | undefined;
 
-  console.log("step 0");
   const pdcTs = new PdcTs();
-  // Define Pandoc command and arguments
-  if (fs.existsSync("/usr/bin/pandoc")) {
-    console.log("Path exists");
-  } else {
-    // FIXME: RETURN 500 error here!!!!
-    console.log("Path does not exists");
-  }
-  const pandocCommand = "/usr/bin/pandoc";
-  const pandocArgs = [
-    "--from=markdown", // Specify input format as Markdown
-    "-o",
-    localPath,
-    "-",
-  ]; // Use '-' to indicate reading from stdin
-  console.log("step 1");
 
   const markdown = "# Heading\n\nThis is some **bold** text.";
   //const markdown = "Very simple text";
@@ -77,36 +55,11 @@ export const handler = async function (
       sourceText: markdown, // Use this if your input is a string. If you set this, the file input will be ignored
       destFilePath: localPath,
     });
-    if (fs.existsSync(localPath)) {
-      console.log("Output PDF file exists");
-      //const fileData = fs.readFileSync("output.pdf")
-      //console.log('file content:', fileData)
-      //deleteFile(localPath);
-    } else {
-      console.log("Output PDF file does NOT exist");
-    }
-    const fileStream = fs.createReadStream(localPath);
-    console.log("starting file upload to s3", { s3Path });
-    const s3Client = new S3Client({ region: "eu-west-2" });
-    const params = {
-      Bucket: "lambda-feedback-staging-frontend-client-bucket",
-      Key: s3Path,
-      Body: fileStream,
-    };
-    const command = new PutObjectCommand(params);
-    const response = await s3Client.send(command);
-
-    console.log("S3 Upload response:", { response });
-    //url = `https://${this.configurationService.PUBLIC_S3_BUCKET}.s3.${this.configurationService.PUBLIC_S3_BUCKET_REGION}.amazonaws.com/${s3Path}`;
-    url = `https://lambda-feedback-staging-frontend-client-bucket.s3.eu-west-2.amazonaws.com/${s3Path}`;
-    console.log("url:", url);
-    console.log("step 4");
   } catch (e: unknown) {
-    console.log("Exception throwned");
+    console.error("PDF generation failed");
     if (e instanceof Error) {
       console.error(e.message);
     } else {
-      console.error("something went wrong generating the pdf");
       console.error(e);
     }
     /*
@@ -123,9 +76,32 @@ export const handler = async function (
     // TODO: add errorRefiner
     //e = errorRefiner(String(e), TeXoutput, false);
     throw e;
+  }
+
+  try {
+    const fileStream = fs.createReadStream(localPath);
+    const s3Client = new S3Client({ region: "eu-west-2" });
+    const params = {
+      Bucket: "lambda-feedback-staging-frontend-client-bucket",
+      Key: s3Path,
+      Body: fileStream,
+    };
+    const command = new PutObjectCommand(params);
+    const response = await s3Client.send(command);
+
+    //url = `https://${this.configurationService.PUBLIC_S3_BUCKET}.s3.${this.configurationService.PUBLIC_S3_BUCKET_REGION}.amazonaws.com/${s3Path}`;
+    url = `https://lambda-feedback-staging-frontend-client-bucket.s3.eu-west-2.amazonaws.com/${s3Path}`;
+    console.log("url:", url);
+  } catch (e: unknown) {
+    console.error("S3 upload failed");
+    if (e instanceof Error) {
+      console.error(e.message);
+    } else {
+      console.error(e);
+    }
+    throw e;
   } finally {
     // cleanup
-    console.log("Calling deleteFile");
     deleteFile(localPath);
   }
 
@@ -135,62 +111,16 @@ export const handler = async function (
       message: "what a lovely day there, is not it?",
     }),
   };
-  /*
-  return new Promise(function (resolve, reject) {
-    // Execute Pandoc command
-    const pandocProcess = spawn(pandocCommand, pandocArgs);
-    console.log("step 2");
-    // Write input string to stdin
-    const inputString = "# Heading\n\nThis is some **bold** text.";
-    pandocProcess.stdin.write(inputString);
-    pandocProcess.stdin.end(); // Close stdin to indicate end of input
-    console.log("step 3");
-
-    // Handle stdout, stderr, and exit events
-    pandocProcess.stdout.on("data", (data) => {
-      console.log(`stdout: ${data}`);
-    });
-    console.log("step 4");
-    pandocProcess.stderr.on("data", (data) => {
-      console.error(`stderr: ${data}`);
-    });
-    console.log("step 5");
-    pandocProcess.on("close", (code) => {
-      if (code === 0) {
-        console.log("Pandoc PDF file generated successfully");
-        if (fs.existsSync(localPath)) {
-          console.log("Output PDF file exists");
-          //const fileData = fs.readFileSync("output.pdf")
-          //console.log('file content:', fileData)
-          deleteFile(localPath);
-          callback(null, {
-            statusCode: 200,
-            body: JSON.stringify({
-              message: "what a lovely day there, is not it?",
-            }),
-          });
-        }
-      } else {
-        console.error(`Pandoc process exited with code ${code}`);
-        deleteFile(localPath);
-        callback(null, { statusCode: 500, body: "PDF not generated" });
-      }
-    });
-  });
-*/
 };
 
 const deleteFile = (filePath: string) => {
-  console.log("Delete file here");
   try {
     fs.rm(filePath, (error) => {
       if (error) {
         console.error("Cannot delete the temperorary file. Error:", error);
-      } else {
-        console.log("file: " + filePath + " deleted");
       }
     });
   } catch (exception) {
-    console.error("Cannot delete temporary file.");
+    console.error("Cannot delete temporary file, exception thrown.");
   }
 };

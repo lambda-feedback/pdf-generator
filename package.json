@@ -14,11 +14,11 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.552.0",
     "pdc-ts": "^1.0.2",
-    "zod": "^3.11.6"
+    "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.136",
-    "@types/node": "^20.12.4",
+    "@types/aws-lambda": "^8.10.137",
+    "@types/node": "^20.12.7",
     "esbuild": "^0.20.2"
   }
 }
