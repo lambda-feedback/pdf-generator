@@ -21,7 +21,17 @@ export const handler = async function (
   context: Context
 ): Promise<APIGatewayProxyResult> {
   console.log("I am starting, your PDF generator");
-  const requestData: RequestData = JSON.parse(JSON.stringify(event.body));
+
+  if (!event.body || event.body === null) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({
+        message: "The request is missing payload",
+      }),
+    };
+  }
+
+  const requestData: RequestData = await JSON.parse(event.body);
   console.log("Processing this request:", requestData);
 
   //const humanSetNumber = set.number + 1;
