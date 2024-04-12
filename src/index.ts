@@ -3,6 +3,7 @@ import * as z from "zod";
 import * as fs from "fs";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { PdcTs } from "pdc-ts";
+import { deleteFile } from "./helpers";
 
 export const SetSchema = z.object({
   functionName: z.string(),
@@ -111,16 +112,4 @@ export const handler = async function (
       message: "what a lovely day there, is not it?",
     }),
   };
-};
-
-const deleteFile = (filePath: string) => {
-  try {
-    fs.rm(filePath, (error) => {
-      if (error) {
-        console.error("Cannot delete the temperorary file. Error:", error);
-      }
-    });
-  } catch (exception) {
-    console.error("Cannot delete temporary file, exception thrown.");
-  }
 };
