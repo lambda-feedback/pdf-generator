@@ -20,8 +20,7 @@ COPY package.json .
 RUN npm install
 
 # Copy and build TypeScript code
-COPY index.ts .
-COPY template.latex template.latex
+COPY src/ .
 RUN npm run build
 
 # Stage 2: Final image
@@ -39,7 +38,6 @@ RUN texconfig rehash
 WORKDIR ${LAMBDA_TASK_ROOT}
 COPY --from=builder /usr/app/dist/* ./
 COPY --from=builder /usr/bin/pandoc /usr/bin/pandoc
-COPY --from=builder /usr/app/template.latex template.latex
 
 RUN chmod +x /usr/bin/pandoc
 
