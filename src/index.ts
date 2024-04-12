@@ -11,13 +11,18 @@ export const SetSchema = z.object({
   apiKey: z.string(),
 });
 
+export interface RequestData {
+  userId: string;
+  markdown: string;
+}
+
 export const handler = async function (
   event: APIGatewayEvent,
   context: Context
 ): Promise<APIGatewayProxyResult> {
   console.log("I am starting, your PDF generator");
-  const message = JSON.parse(JSON.stringify(event));
-  console.log("Processing this event:", message);
+  const requestData: RequestData = JSON.parse(JSON.stringify(event));
+  console.log("Processing this request:", requestData);
 
   //const humanSetNumber = set.number + 1;
   const humanSetNumber = 1;
@@ -43,8 +48,10 @@ export const handler = async function (
 
   const pdcTs = new PdcTs();
 
-  const markdown = "# Heading\n\nThis is some **bold** text.";
+  //const markdown = "# Heading\n\nThis is some **bold** text.";
   //const markdown = "Very simple text";
+  const markdown = requestData.markdown;
+  console.log("Markdown:", markdown);
   try {
     await pdcTs.Execute({
       //     from: "markdown-implicit_figures", // pandoc source format (disabling the implicit_figures extension to remove all image captions)
