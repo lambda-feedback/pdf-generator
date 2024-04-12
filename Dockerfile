@@ -31,9 +31,6 @@ RUN yum install -y \
   texlive-collection-latexrecommended.noarch \
   texlive-iftex.noarch
 
-# This fixes weird format not found issue, not sure how it works
-RUN texconfig rehash
-
 # Copy built files from previous stage
 WORKDIR ${LAMBDA_TASK_ROOT}
 COPY --from=builder /usr/app/dist/* ./
