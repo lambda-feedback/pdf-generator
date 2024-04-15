@@ -36,7 +36,7 @@ export const handler = async function (
 
   //const requestData: RequestData = await JSON.parse(JSON.stringify(event.body));
 
-  const parsed = schema.safeParse(JSON.parse(JSON.stringify(event.body)));
+  const parsed = schema.safeParse(JSON.parse(event.body));
 
   if (!parsed.success) {
     console.error("The request does not contain correct payload:", event.body);
