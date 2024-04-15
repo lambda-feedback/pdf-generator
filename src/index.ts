@@ -1,15 +1,8 @@
 import { APIGatewayEvent, Context, APIGatewayProxyResult } from "aws-lambda";
-import * as z from "zod";
 import * as fs from "fs";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { PdcTs } from "pdc-ts";
 import { deleteFile } from "./helpers";
-
-export const SetSchema = z.object({
-  functionName: z.string(),
-  dockerImageUri: z.string(),
-  apiKey: z.string(),
-});
 
 export interface RequestData {
   userId: string;
