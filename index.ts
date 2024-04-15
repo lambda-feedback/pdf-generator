@@ -2,12 +2,18 @@ import { APIGatewayEvent, Context, APIGatewayProxyResult } from "aws-lambda";
 import * as fs from "fs";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { PdcTs } from "pdc-ts";
-import { deleteFile } from "./helpers";
+import { deleteFile } from "./src/helpers";
+import { z } from "zod";
 
 export interface RequestData {
   userId: string;
   markdown: string;
 }
+
+export const schema = z.object({
+  userId: z.string(),
+  markdown: z.string(),
+});
 
 export const handler = async function (
   event: APIGatewayEvent,
@@ -21,13 +27,30 @@ export const handler = async function (
     return {
       statusCode: 400,
       body: JSON.stringify({
-        message: "The request is missing payload",
+        message: "The request does not contain payload",
       }),
     };
   }
 
-  const requestData: RequestData = await JSON.parse(event.body);
-  console.log("Processing this request:", requestData);
+  console.log("Event body:", event.body);
+
+  //const requestData: RequestData = await JSON.parse(JSON.stringify(event.body));
+
+  const parsed = schema.safeParse(JSON.parse(JSON.stringify(event.body)));
+
+  if (!parsed.success) {
+    console.error("The request does not contain correct payload:", event.body);
+    return {
+      statusCode: 400,
+      body: JSON.stringify({
+        message: "The request does not contain correct payload",
+      }),
+    };
+  }
+
+  const requestData = parsed.data;
+
+  console.log("Processing this request:", parsed.data);
 
   //const humanSetNumber = set.number + 1;
   const humanSetNumber = 1;

@@ -20,7 +20,8 @@ COPY package.json .
 RUN npm install
 
 # Copy and build TypeScript code
-COPY src/ .
+COPY src/ ./src
+COPY index.ts index.ts
 RUN npm run build
 
 # Stage 2: Final image
@@ -35,7 +36,7 @@ RUN yum install -y \
 WORKDIR ${LAMBDA_TASK_ROOT}
 COPY --from=builder /usr/app/dist/* ./
 COPY --from=builder /usr/bin/pandoc /usr/bin/pandoc
-COPY --from=builder /usr/app/template.latex template.latex
+COPY --from=builder /usr/app/src/template.latex template.latex
 
 RUN chmod +x /usr/bin/pandoc
 
