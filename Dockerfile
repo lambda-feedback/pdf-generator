@@ -1,8 +1,8 @@
 # Stage 1: Build TypeScript code and install Pandoc
-FROM public.ecr.aws/lambda/nodejs:16 as builder
+FROM public.ecr.aws/lambda/nodejs:20 as builder
 
 # Install tar and gzip
-RUN yum install -y tar gzip
+RUN dnf install -y tar gzip
 
 # Download and install Pandoc
 RUN curl -fsSL https://github.com/jgm/pandoc/releases/download/3.1.13/pandoc-3.1.13-linux-amd64.tar.gz -o /tmp/pandoc.tar.gz \

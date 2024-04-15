@@ -22,6 +22,8 @@ export const handler = async function (
 ): Promise<APIGatewayProxyResult> {
   console.log("I am starting, your PDF generator");
 
+  console.log("Event payload:", event);
+
   if (!event.body || event.body === null) {
     return {
       statusCode: 400,
