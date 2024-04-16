@@ -16,8 +16,9 @@ export const handler = async function (
   event: APIGatewayEvent,
   context: Context
 ): Promise<APIGatewayProxyResult> {
+  console.log("Hello from lambda pdf generator");
   if (!event.body || event.body === null) {
-    console.log("requset:", event);
+    console.error("requset:", event);
     return {
       statusCode: 400,
       body: "The request does not contain payload",
