@@ -20,7 +20,7 @@ export const handler = async function (
     return {
       statusCode: 400,
       body: JSON.stringify({
-        error: "The request does not contain payload",
+        message: "The request does not contain payload",
       }),
     };
   }
@@ -32,7 +32,7 @@ export const handler = async function (
     return {
       statusCode: 400,
       body: JSON.stringify({
-        error: "The request does not contain correct payload",
+        message: "The request does not contain correct payload",
       }),
     };
   }
@@ -90,7 +90,7 @@ export const handler = async function (
     return {
       statusCode: 500,
       body: JSON.stringify({
-        error: e,
+        message: e,
       }),
     };
   }
@@ -116,7 +116,7 @@ export const handler = async function (
       return {
         statusCode: 500,
         body: JSON.stringify({
-          error: e.message,
+          message: e.message,
         }),
       };
     } else {
@@ -124,7 +124,7 @@ export const handler = async function (
       return {
         statusCode: 500,
         body: JSON.stringify({
-          error: "S3 Upload failed",
+          message: "S3 Upload failed",
         }),
       };
     }
