@@ -5,24 +5,17 @@ import { PdcTs } from "pdc-ts";
 import { deleteFile } from "./src/helpers";
 import { z } from "zod";
 
-export interface RequestData {
-  userId: string;
-  markdown: string;
-}
-
 export const schema = z.object({
   userId: z.string(),
   markdown: z.string(),
+  setNumber: z.number(),
+  moduleSlug: z.string(),
 });
 
 export const handler = async function (
   event: APIGatewayEvent,
   context: Context
 ): Promise<APIGatewayProxyResult> {
-  console.log("I am starting, your PDF generator");
-
-  console.log("Event payload:", event);
-
   if (!event.body || event.body === null) {
     return {
       statusCode: 400,
@@ -31,10 +24,6 @@ export const handler = async function (
       }),
     };
   }
-
-  console.log("Event body:", event.body);
-
-  //const requestData: RequestData = await JSON.parse(JSON.stringify(event.body));
 
   const parsed = schema.safeParse(JSON.parse(event.body));
 
@@ -50,28 +39,23 @@ export const handler = async function (
 
   const requestData = parsed.data;
 
-  console.log("Processing this request:", parsed.data);
+  console.log("Request data:", requestData);
+  const humanSetNumber = requestData.setNumber + 1;
 
-  //const humanSetNumber = set.number + 1;
-  const humanSetNumber = 1;
-
-  /*
-  const filename = `${
-    set.ModuleInstance.Module.slug
-  }_S${humanSetNumber}_${new Date()
+  const filename = `${requestData.moduleSlug}_S${humanSetNumber}_${new Date()
     .toISOString()
-    .replace(/[-:T.]/g, '')
+    .replace(/[-:T.]/g, "")
     .slice(0, 14)}.pdf`; // Note: set name not a slug so not used.
-*/
+  /*
   const filename = `test_S${humanSetNumber}_${new Date()
     .toISOString()
     .replace(/[-:T.]/g, "")
     .slice(0, 14)}.pdf`; // Note: set name not a slug so not used.
+*/
 
-  //const localPath = `src/pdf/${filename}`;
   const localPath = `/tmp/${filename}`;
-  //const s3Path = `${user.id}/${filename}`;
-  const s3Path = `test/${filename}`;
+  const s3Path = `${requestData.userId}/${filename}`;
+  //const s3Path = `test/${filename}`;
   let url: string | undefined;
 
   const pdcTs = new PdcTs();
@@ -82,8 +66,8 @@ export const handler = async function (
   console.log("Markdown:", markdown);
   try {
     await pdcTs.Execute({
-      //     from: "markdown-implicit_figures", // pandoc source format (disabling the implicit_figures extension to remove all image captions)
-      from: "markdown",
+      from: "markdown-implicit_figures", // pandoc source format (disabling the implicit_figures extension to remove all image captions)
+      //from: "markdown",
       to: "latex", // pandoc output format
       pandocArgs: ["--pdf-engine=pdflatex", `--template=./template.latex`],
       spawnOpts: { argv0: "+RTS -M512M -RTS" },
@@ -144,7 +128,7 @@ export const handler = async function (
   return {
     statusCode: 200,
     body: JSON.stringify({
-      message: "what a lovely day there, is not it?",
+      url,
     }),
   };
 };
