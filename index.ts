@@ -113,10 +113,21 @@ export const handler = async function (
     console.error("S3 upload failed");
     if (e instanceof Error) {
       console.error(e.message);
+      return {
+        statusCode: 500,
+        body: JSON.stringify({
+          error: e.message,
+        }),
+      };
     } else {
       console.error(e);
+      return {
+        statusCode: 500,
+        body: JSON.stringify({
+          error: "S3 Upload failed",
+        }),
+      };
     }
-    throw e;
   } finally {
     // cleanup
     deleteFile(localPath);
