@@ -17,7 +17,7 @@ export const handler = async function (
   context: Context
 ): Promise<APIGatewayProxyResult> {
   console.log("Hello from lambda pdf generator");
-  if (!event.body || event.body === null) {
+  if (!event || event === null) {
     console.error("requset:", event);
     return {
       statusCode: 400,
@@ -25,7 +25,7 @@ export const handler = async function (
     };
   }
 
-  const parsed = schema.safeParse(JSON.parse(event.body));
+  const parsed = schema.safeParse(JSON.parse(JSON.stringify(event)));
 
   if (!parsed.success) {
     console.error("The request does not contain correct payload:", event.body);
