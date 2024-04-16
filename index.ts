@@ -17,6 +17,7 @@ export const handler = async function (
   context: Context
 ): Promise<APIGatewayProxyResult> {
   if (!event.body || event.body === null) {
+    console.log("requset:", event);
     return {
       statusCode: 400,
       body: "The request does not contain payload",
