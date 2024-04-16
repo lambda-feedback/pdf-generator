@@ -2,7 +2,7 @@ import { APIGatewayEvent, Context, APIGatewayProxyResult } from "aws-lambda";
 import * as fs from "fs";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { PdcTs } from "pdc-ts";
-import { deleteFile } from "./src/helpers";
+import { deleteFile, errorRefiner } from "./src/utils";
 import { z } from "zod";
 
 export const schema = z.object({
@@ -20,7 +20,7 @@ export const handler = async function (
     return {
       statusCode: 400,
       body: JSON.stringify({
-        message: "The request does not contain payload",
+        error: "The request does not contain payload",
       }),
     };
   }
@@ -32,7 +32,7 @@ export const handler = async function (
     return {
       statusCode: 400,
       body: JSON.stringify({
-        message: "The request does not contain correct payload",
+        error: "The request does not contain correct payload",
       }),
     };
   }
@@ -46,22 +46,14 @@ export const handler = async function (
     .toISOString()
     .replace(/[-:T.]/g, "")
     .slice(0, 14)}.pdf`; // Note: set name not a slug so not used.
-  /*
-  const filename = `test_S${humanSetNumber}_${new Date()
-    .toISOString()
-    .replace(/[-:T.]/g, "")
-    .slice(0, 14)}.pdf`; // Note: set name not a slug so not used.
-*/
 
   const localPath = `/tmp/${filename}`;
   const s3Path = `${requestData.userId}/${filename}`;
-  //const s3Path = `test/${filename}`;
   let url: string | undefined;
 
   const pdcTs = new PdcTs();
 
   //const markdown = "# Heading\n\nThis is some **bold** text.";
-  //const markdown = "Very simple text";
   const markdown = requestData.markdown;
   console.log("Markdown:", markdown);
   try {
@@ -82,7 +74,7 @@ export const handler = async function (
     } else {
       console.error(e);
     }
-    /*
+
     const TeXoutput = await pdcTs.Execute({
       from: "markdown-implicit_figures", // pandoc source format (disabling the implicit_figures extension to remove all image captions)
       to: "latex", // pandoc output format
@@ -91,11 +83,16 @@ export const handler = async function (
       sourceText: markdown, // Use this if your input is a string. If you set this, the file input will be ignored
       destFilePath: localPath,
     });
-    */
+
     // Find the offending text from the error message:
-    // TODO: add errorRefiner
-    //e = errorRefiner(String(e), TeXoutput, false);
-    throw e;
+    e = errorRefiner(String(e), TeXoutput, false);
+
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        error: e,
+      }),
+    };
   }
 
   try {
