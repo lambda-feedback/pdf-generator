@@ -19,9 +19,7 @@ export const handler = async function (
   if (!event.body || event.body === null) {
     return {
       statusCode: 400,
-      body: JSON.stringify({
-        message: "The request does not contain payload",
-      }),
+      body: "The request does not contain payload",
     };
   }
 
@@ -31,9 +29,7 @@ export const handler = async function (
     console.error("The request does not contain correct payload:", event.body);
     return {
       statusCode: 400,
-      body: JSON.stringify({
-        message: "The request does not contain correct payload",
-      }),
+      body: "The request does not contain correct payload",
     };
   }
 
@@ -89,9 +85,7 @@ export const handler = async function (
 
     return {
       statusCode: 500,
-      body: JSON.stringify({
-        message: e,
-      }),
+      body: JSON.stringify({ e }),
     };
   }
 
@@ -115,17 +109,13 @@ export const handler = async function (
       console.error(e.message);
       return {
         statusCode: 500,
-        body: JSON.stringify({
-          message: e.message,
-        }),
+        body: e.message,
       };
     } else {
       console.error(e);
       return {
         statusCode: 500,
-        body: JSON.stringify({
-          message: "S3 Upload failed",
-        }),
+        body: "S3 Upload failed",
       };
     }
   } finally {
