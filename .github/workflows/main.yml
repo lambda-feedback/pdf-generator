@@ -9,7 +9,7 @@ jobs:
     name: Staging deployment of pdf generator lambda function
     runs-on: ubuntu-latest
     steps:
-      - name: temporar approval
+      - name: approvers
         uses: trstringer/manual-approval@v1
         with:
           secret: ${{ github.TOKEN }}
