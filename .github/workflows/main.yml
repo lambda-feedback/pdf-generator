@@ -45,6 +45,7 @@ jobs:
               --image-uri $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
   prod_job:
+    needs: staging_job
     name: Prod deployment of pdf generator lambda function
     runs-on: ubuntu-latest
     steps:
