@@ -46,7 +46,7 @@ jobs:
 
   approval_job:
     needs: staging_job
-    name: Prod deployment of pdf generator lambda function
+    name: Waiting for approval
     runs-on: ubuntu-latest
     steps:
       - name: Approve step
@@ -63,21 +63,9 @@ jobs:
 
   prod_job:
     needs: approval_job
-    name: Waiting for approval
+    name: Prod deployment of pdf generator lambda function
     runs-on: ubuntu-latest
     steps:
-      - name: Approve step
-        uses: trstringer/manual-approval@v1
-        with:
-          secret: ${{ github.TOKEN }}
-          approvers: jarkabaker
-          minimum-approvals: 1
-          issue-title: "Deploying to prod"
-          issue-body: "Please approve or deny the deployment (in the tab Issues)"
-          exclude-workflow-initiator-as-approver: false
-          additional-approved-words: ""
-          additional-denied-words: ""
-
       - name: Build and push the tagged docker image to Amazon ECR
         id: build-custom-image
         env:
