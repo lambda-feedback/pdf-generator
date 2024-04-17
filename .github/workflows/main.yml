@@ -6,7 +6,7 @@ on:
 
 jobs:
   deploy:
-    name: Main deployment of pdf generator lambda function
+    name: Staging deployment of pdf generator lambda function
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -44,6 +44,10 @@ jobs:
               --function-name lambda-feedback-staging-pdf-generator \
               --image-uri $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
+  deploy:
+    name: Prod deployment of pdf generator lambda function
+    runs-on: ubuntu-latest
+    steps:
       - name: Waiting for approval
         uses: trstringer/manual-approval@v1
         with:
