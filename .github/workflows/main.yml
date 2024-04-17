@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 jobs:
-  deploy:
+  staging_job:
     name: Staging deployment of pdf generator lambda function
     runs-on: ubuntu-latest
     steps:
@@ -44,7 +44,7 @@ jobs:
               --function-name lambda-feedback-staging-pdf-generator \
               --image-uri $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-  deploy:
+  prod_job:
     name: Prod deployment of pdf generator lambda function
     runs-on: ubuntu-latest
     steps:
