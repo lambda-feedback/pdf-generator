@@ -16,7 +16,6 @@ export const handler = async function (
   event: APIGatewayEvent,
   context: Context
 ): Promise<APIGatewayProxyResult> {
-  console.log("Hello from lambda pdf generator");
   if (!event || event === null) {
     console.error("requset:", event);
     return {
@@ -36,10 +35,7 @@ export const handler = async function (
   }
 
   const requestData = parsed.data;
-
-  console.log("Request data:", requestData);
   const humanSetNumber = requestData.setNumber + 1;
-
   const filename = `${requestData.moduleSlug}_S${humanSetNumber}_${new Date()
     .toISOString()
     .replace(/[-:T.]/g, "")
@@ -53,7 +49,6 @@ export const handler = async function (
 
   //const markdown = "# Heading\n\nThis is some **bold** text.";
   const markdown = requestData.markdown;
-  console.log("Markdown:", markdown);
   try {
     await pdcTs.Execute({
       from: "markdown-implicit_figures", // pandoc source format (disabling the implicit_figures extension to remove all image captions)
@@ -66,7 +61,6 @@ export const handler = async function (
       destFilePath: localPath,
     });
   } catch (e: unknown) {
-    console.error("PDF generation failed");
     if (e instanceof Error) {
       console.error(e.message);
     } else {
@@ -104,7 +98,6 @@ export const handler = async function (
 
     //url = `https://${this.configurationService.PUBLIC_S3_BUCKET}.s3.${this.configurationService.PUBLIC_S3_BUCKET_REGION}.amazonaws.com/${s3Path}`;
     url = `https://lambda-feedback-staging-frontend-client-bucket.s3.eu-west-2.amazonaws.com/${s3Path}`;
-    console.log("url:", url);
   } catch (e: unknown) {
     console.error("S3 upload failed");
     if (e instanceof Error) {
