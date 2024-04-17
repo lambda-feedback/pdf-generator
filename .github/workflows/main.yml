@@ -49,29 +49,34 @@ jobs:
     name: Prod deployment of pdf generator lambda function
     runs-on: ubuntu-latest
     steps:
-      - name: Waiting for approval
-        uses: trstringer/manual-approval@v1
-        with:
-          secret: ${{ steps.generate_token.outputs.token }}
-          approvers: myteam
-          minimum-approvals: 1
+      steps:
+        - uses: trstringer/manual-approval@v1
+          with:
+            secret: ${{ github.TOKEN }}
+            approvers: approval-team
+            minimum-approvals: 1
+            issue-title: "Deploying to prod"
+            issue-body: "Please approve or deny the deployment"
+            exclude-workflow-initiator-as-approver: false
+            additional-approved-words: ""
+            additional-denied-words: ""
 
-      - name: Build and push the tagged docker image to Amazon ECR
-        id: build-custom-image
-        env:
-          ECR_REGISTRY: ${{ steps.login-pf-aws-ecr.outputs.registry }}
-          ECR_REPOSITORY: lambda-feedback-prod-pdf-generator
-          IMAGE_TAG: latest
-        run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        - name: Build and push the tagged docker image to Amazon ECR
+          id: build-custom-image
+          env:
+            ECR_REGISTRY: ${{ steps.login-pf-aws-ecr.outputs.registry }}
+            ECR_REPOSITORY: lambda-feedback-prod-pdf-generator
+            IMAGE_TAG: latest
+          run: |
+            docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+            docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-      - name: Update aws custom lambda function code
-        env:
-          ECR_REGISTRY: ${{ steps.login-pf-aws-ecr.outputs.registry }}
-          ECR_REPOSITORY: lambda-feedback-prod-pdf-generator
-          IMAGE_TAG: latest
-        run: |
-          aws lambda update-function-code \
-              --function-name lambda-feedback-prod-pdf-generator \
-              --image-uri $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        - name: Update aws custom lambda function code
+          env:
+            ECR_REGISTRY: ${{ steps.login-pf-aws-ecr.outputs.registry }}
+            ECR_REPOSITORY: lambda-feedback-prod-pdf-generator
+            IMAGE_TAG: latest
+          run: |
+            aws lambda update-function-code \
+                --function-name lambda-feedback-prod-pdf-generator \
+                --image-uri $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
