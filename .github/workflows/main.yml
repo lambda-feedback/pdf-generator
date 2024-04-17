@@ -9,18 +9,6 @@ jobs:
     name: Staging deployment of pdf generator lambda function
     runs-on: ubuntu-latest
     steps:
-      - name: Approve step
-        uses: trstringer/manual-approval@v1
-        with:
-          secret: ${{ github.TOKEN }}
-          approvers: jarkabaker
-          minimum-approvals: 1
-          issue-title: "Deploying to prod"
-          issue-body: "Please approve or deny the deployment"
-          exclude-workflow-initiator-as-approver: false
-          additional-approved-words: ""
-          additional-denied-words: ""
-
       - name: Checkout Code
         uses: actions/checkout@v2
 
@@ -56,18 +44,37 @@ jobs:
               --function-name lambda-feedback-staging-pdf-generator \
               --image-uri $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-  prod_job:
+  approval_job:
     needs: staging_job
-    name: Prod deployment of pdf generator lambda function
+        name: Prod deployment of pdf generator lambda function
+        runs-on: ubuntu-latest
+        steps:
+          - name: Approve step
+            uses: trstringer/manual-approval@v1
+            with:
+              secret: ${{ github.TOKEN }}
+              approvers: jarkabaker
+              minimum-approvals: 1
+              issue-title: "Deploying to prod"
+              issue-body: "Please approve or deny the deployment"
+              exclude-workflow-initiator-as-approver: false
+              additional-approved-words: ""
+              additional-denied-words: ""
+
+
+  prod_job:
+    needs: approval_job
+    name: Waiting for approval
     runs-on: ubuntu-latest
     steps:
-      - uses: trstringer/manual-approval@v1
+      - name: Approve step
+        uses: trstringer/manual-approval@v1
         with:
           secret: ${{ github.TOKEN }}
-          approvers: lambda-feedback/approvers
+          approvers: jarkabaker
           minimum-approvals: 1
           issue-title: "Deploying to prod"
-          issue-body: "Please approve or deny the deployment"
+          issue-body: "Please approve or deny the deployment (in the tab Issues)"
           exclude-workflow-initiator-as-approver: false
           additional-approved-words: ""
           additional-denied-words: ""
