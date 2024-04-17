@@ -27,7 +27,7 @@ jobs:
         id: build-custom-image
         env:
           ECR_REGISTRY: ${{ steps.login-pf-aws-ecr.outputs.registry }}
-          ECR_REPOSITORY: lambda-feedback-prod-pdf-generator
+          ECR_REPOSITORY: lambda-feedback-staging-pdf-generator
           IMAGE_TAG: latest
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
@@ -36,9 +36,9 @@ jobs:
       - name: Update aws custom lambda function code
         env:
           ECR_REGISTRY: ${{ steps.login-pf-aws-ecr.outputs.registry }}
-          ECR_REPOSITORY: lambda-feedback-prod-pdf-generator
+          ECR_REPOSITORY: lambda-feedback-staging-pdf-generator
           IMAGE_TAG: latest
         run: |
           aws lambda update-function-code \
-              --function-name lambda-feedback-prod-pdf-generator \
+              --function-name lambda-feedback-staging-pdf-generator \
               --image-uri $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
