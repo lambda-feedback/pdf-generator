@@ -13,8 +13,7 @@ export const schema = z.object({
 });
 
 export const handler = async function (
-  event: APIGatewayEvent,
-  context: Context
+  event: APIGatewayEvent
 ): Promise<APIGatewayProxyResult> {
   if (!event || event === null) {
     console.error("requset:", event);
@@ -47,7 +46,6 @@ export const handler = async function (
 
   const pdcTs = new PdcTs();
 
-  //const markdown = "# Heading\n\nThis is some **bold** text.";
   const markdown = requestData.markdown;
   try {
     await pdcTs.Execute({
@@ -94,15 +92,12 @@ export const handler = async function (
       Key: s3Path,
       Body: fileStream,
     };
+
     const command = new PutObjectCommand(params);
     await s3Client.send(command);
 
     const s3Bucket = process.env.PUBLIC_S3_BUCKET;
-
-    console.log("s3Bucket:", s3Bucket);
-
     url = `https://${s3Bucket}.s3.${region}.amazonaws.com/${s3Path}`;
-    //url = `https://lambda-feedback-staging-frontend-client-bucket.s3.eu-west-2.amazonaws.com/${s3Path}`;
   } catch (e: unknown) {
     console.error("S3 upload failed");
     if (e instanceof Error) {

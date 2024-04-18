@@ -15,7 +15,6 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          # Created the Secrets Under the Repo only with These Variables
           aws-access-key-id: ${{ secrets.LAMBDA_CONTAINER_PIPELINE_AWS_ID }}
           aws-secret-access-key: ${{ secrets.LAMBDA_CONTAINER_PIPELINE_AWS_SECRET }}
           aws-region: eu-west-2
@@ -78,7 +77,6 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          # Created the Secrets Under the Repo only with These Variables
           aws-access-key-id: ${{ secrets.LAMBDA_CONTAINER_PIPELINE_AWS_ID }}
           aws-secret-access-key: ${{ secrets.LAMBDA_CONTAINER_PIPELINE_AWS_SECRET }}
           aws-region: eu-west-2
