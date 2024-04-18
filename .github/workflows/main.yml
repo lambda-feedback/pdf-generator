@@ -63,7 +63,7 @@ jobs:
           issue-title: Approve Production Deployment
           issue-body: "Approve production deployment for the PDF generator"
           exclude-workflow-initiator-as-approver: false
-          additional-approved-words: "ok"
+          additional-approved-words: ok, fine
           additional-denied-words: ""
 
   prod_job:
