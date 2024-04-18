@@ -63,7 +63,7 @@ jobs:
           issue-title: Approve Production Deployment
           issue-body: "Approve production deployment. Go to the tab Issues, type approve and click the button"
           exclude-workflow-initiator-as-approver: false
-          additional-approved-words: ""
+          additional-approved-words: "fine"
           additional-denied-words: ""
 
   prod_job:
