@@ -61,9 +61,9 @@ jobs:
           approvers: approvers
           secret: ${{ steps.generate_token.outputs.token }}
           issue-title: Approve Production Deployment
-          issue-body: "Approve production deployment. Go to the tab Issues, type approve and click the button"
+          issue-body: "Approve production deployment for the PDF generator"
           exclude-workflow-initiator-as-approver: false
-          additional-approved-words: "fine"
+          additional-approved-words: "ok"
           additional-denied-words: ""
 
   prod_job:
