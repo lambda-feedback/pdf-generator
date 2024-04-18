@@ -54,7 +54,7 @@ jobs:
         uses: tibdex/github-app-token@v1
         with:
           app_id: ${{ secrets.APP_ID }}
-          private_key: ${{ secrets.APP_KEY }}
+          private_key: ${{ secrets.APP_SECRET }}
       - name: Approve Production Deployment
         uses: trstringer/manual-approval@v1.7.0
         with:
