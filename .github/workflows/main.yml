@@ -55,13 +55,13 @@ jobs:
           app_id: ${{ secrets.APP_ID }}
           private_key: ${{ secrets.APP_SECRET }}
       - name: Approve Production Deployment
-        uses: trstringer/manual-approval@v1.7.0
+        uses: trstringer/manual-approval@v1
         with:
           approvers: approvers
           minimum-approvals: 1
           secret: ${{ steps.generate_token.outputs.token }}
           issue-title: Approve Production Deployment
-          issue-body: "Approve production deployment for the PDF generator"
+          issue-body: Approve production deployment for the PDF generator
           exclude-workflow-initiator-as-approver: false
           additional-approved-words: fine, go
           additional-denied-words: ""
