@@ -87,8 +87,9 @@ export const handler = async function (
     const region = "eu-west-2";
     const fileStream = fs.createReadStream(localPath);
     const s3Client = new S3Client({ region });
+    const s3Bucket = process.env.PUBLIC_S3_BUCKET;
     const params = {
-      Bucket: "lambda-feedback-staging-frontend-client-bucket",
+      Bucket: s3Bucket,
       Key: s3Path,
       Body: fileStream,
     };
@@ -96,7 +97,6 @@ export const handler = async function (
     const command = new PutObjectCommand(params);
     await s3Client.send(command);
 
-    const s3Bucket = process.env.PUBLIC_S3_BUCKET;
     url = `https://${s3Bucket}.s3.${region}.amazonaws.com/${s3Path}`;
   } catch (e: unknown) {
     console.error("S3 upload failed");
