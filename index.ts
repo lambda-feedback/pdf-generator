@@ -16,17 +16,17 @@ export const handler = async function (
   event: APIGatewayEvent
 ): Promise<APIGatewayProxyResult> {
   if (!event || event === null) {
-    console.error("request:", event);
+    console.error("requset:", event);
     return {
       statusCode: 400,
       body: "The request does not contain payload",
     };
   }
 
-  const parsed = schema.safeParse(event);
+  const parsed = schema.safeParse(JSON.parse(JSON.stringify(event)));
 
   if (!parsed.success) {
-    console.error("The request does not contain correct payload:", event);
+    console.error("The request does not contain correct payload:", event.body);
     return {
       statusCode: 400,
       body: "The request does not contain correct payload",
@@ -35,11 +35,10 @@ export const handler = async function (
 
   const requestData = parsed.data;
   const humanSetNumber = requestData.setNumber + 1;
-  const timestamp = new Date()
+  const filename = `${requestData.moduleSlug}_S${humanSetNumber}_${new Date()
     .toISOString()
     .replace(/[-:T.]/g, "")
-    .slice(0, 14);
-  const filename = `${requestData.moduleSlug}_S${humanSetNumber}_${timestamp}.pdf`;
+    .slice(0, 14)}.pdf`; // Note: set name not a slug so not used.
 
   const localPath = `/tmp/${filename}`;
   const s3Path = `${requestData.userId}/${filename}`;
@@ -51,8 +50,9 @@ export const handler = async function (
   try {
     await pdcTs.Execute({
       from: "markdown-implicit_figures", // pandoc source format (disabling the implicit_figures extension to remove all image captions)
+      //from: "markdown",
       to: "latex", // pandoc output format
-      pandocArgs: ["--pdf-engine=xelatex", `--template=./template.latex`],
+      pandocArgs: ["--pdf-engine=pdflatex", `--template=./template.latex`],
       spawnOpts: { argv0: "+RTS -M512M -RTS" },
       outputToFile: true, // Controls whether the output will be returned as a string or written to a file
       sourceText: markdown, // Use this if your input is a string. If you set this, the file input will be ignored
@@ -71,6 +71,7 @@ export const handler = async function (
       pandocArgs: ["--pdf-engine=xelatex", `--template=./template.latex`],
       outputToFile: false, // Controls whether the output will be returned as a string or written to a file
       sourceText: markdown, // Use this if your input is a string. If you set this, the file input will be ignored
+      destFilePath: localPath,
     });
 
     // Find the offending text from the error message:
