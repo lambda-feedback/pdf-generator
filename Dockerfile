@@ -1,16 +1,14 @@
 # Stage 1: Build TypeScript code and install Pandoc
-FROM public.ecr.aws/lambda/nodejs:18 as builder
+FROM public.ecr.aws/lambda/nodejs:20 as builder
 
 # Install tar and gzip
-RUN yum install -y tar gzip
+RUN dnf install -y tar gzip
 
 # Download and install Pandoc
 RUN curl -fsSL https://github.com/jgm/pandoc/releases/download/3.1.13/pandoc-3.1.13-linux-amd64.tar.gz -o /tmp/pandoc.tar.gz \
   && tar -xzf /tmp/pandoc.tar.gz -C /tmp \
   && mv /tmp/pandoc-3.1.13/bin/pandoc /usr/bin \
   && rm -rf /tmp/pandoc.tar.gz /tmp/pandoc-3.1.13
-
-RUN /usr/bin/pandoc --help
 
 RUN chmod +x /usr/bin/pandoc
 
@@ -25,10 +23,10 @@ COPY index.ts index.ts
 RUN npm run build
 
 # Stage 2: Final image
-FROM public.ecr.aws/lambda/nodejs:18
+FROM public.ecr.aws/lambda/nodejs:20
 
 # Install Latex environment and dependencies
-RUN yum install -y \
+RUN dnf install -y \
   texlive-collection-latexrecommended.noarch \
   texlive-iftex.noarch
 
@@ -37,6 +35,10 @@ WORKDIR ${LAMBDA_TASK_ROOT}
 COPY --from=builder /usr/app/dist/* ./
 COPY --from=builder /usr/bin/pandoc /usr/bin/pandoc
 COPY --from=builder /usr/app/src/template.latex template.latex
+
+ENV TEXMFHOME /tmp/texmf
+ENV TEXMFCONFIG /tmp/texmf-config
+ENV TEXMFVAR /tmp/texmf-var
 
 RUN chmod +x /usr/bin/pandoc
 
