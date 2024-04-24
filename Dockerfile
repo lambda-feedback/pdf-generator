@@ -48,6 +48,10 @@ COPY ./src/template.latex template.latex
 COPY --from=builder /app/dist/* ./
 COPY --from=pandoc /usr/bin/pandoc /usr/bin/pandoc
 
+ENV TEXMFHOME /tmp/texmf
+ENV TEXMFCONFIG /tmp/texmf-config
+ENV TEXMFVAR /tmp/texmf-var
+
 RUN chmod +x /usr/bin/pandoc
 
 ENV TEXMFHOME /tmp/texmf

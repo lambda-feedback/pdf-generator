@@ -71,6 +71,7 @@ export const handler = async function (
       pandocArgs: ["--pdf-engine=pdflatex", `--template=./template.latex`],
       outputToFile: false, // Controls whether the output will be returned as a string or written to a file
       sourceText: markdown, // Use this if your input is a string. If you set this, the file input will be ignored
+      destFilePath: localPath,
     });
 
     // Find the offending text from the error message:
