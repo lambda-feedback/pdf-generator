@@ -2,7 +2,7 @@
 FROM public.ecr.aws/lambda/nodejs:18 as builder
 
 # Install tar and gzip
-RUN dnf install -y tar gzip
+RUN yum install -y tar gzip
 
 # Download and install Pandoc
 RUN curl -fsSL https://github.com/jgm/pandoc/releases/download/3.1.13/pandoc-3.1.13-linux-amd64.tar.gz -o /tmp/pandoc.tar.gz \
@@ -28,7 +28,7 @@ RUN npm run build
 FROM public.ecr.aws/lambda/nodejs:18
 
 # Install Latex environment and dependencies
-RUN dnf install -y \
+RUN yum install -y \
   texlive-collection-latexrecommended.noarch \
   texlive-iftex.noarch
 
