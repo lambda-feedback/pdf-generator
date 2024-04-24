@@ -1,40 +1,52 @@
-# Stage 1: Build TypeScript code and install Pandoc
-FROM public.ecr.aws/lambda/nodejs:20 as builder
+ARG NODE_VERSION=20
+
+# Stage 1: Install pandoc
+FROM public.ecr.aws/lambda/nodejs:${NODE_VERSION} as pandoc
+
+ARG PANDOC_VERSION=3.1.13
 
 # Install tar and gzip
 RUN dnf install -y tar gzip
 
 # Download and install Pandoc
-RUN curl -fsSL https://github.com/jgm/pandoc/releases/download/3.1.13/pandoc-3.1.13-linux-amd64.tar.gz -o /tmp/pandoc.tar.gz \
+RUN curl -fsSL https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-linux-amd64.tar.gz -o /tmp/pandoc.tar.gz \
   && tar -xzf /tmp/pandoc.tar.gz -C /tmp \
-  && mv /tmp/pandoc-3.1.13/bin/pandoc /usr/bin \
-  && rm -rf /tmp/pandoc.tar.gz /tmp/pandoc-3.1.13
+  && mv /tmp/pandoc-${PANDOC_VERSION}/bin/pandoc /usr/bin \
+  && rm -rf /tmp/pandoc.tar.gz /tmp/pandoc-${PANDOC_VERSION}
 
 RUN chmod +x /usr/bin/pandoc
 
-# Copy package.json and install dependencies
-WORKDIR /usr/app
-COPY package.json .
+# Stage 2: Build the Lambda function
+FROM public.ecr.aws/lambda/nodejs:${NODE_VERSION} as builder
+
+# Copy package.json and package-lock.json and install dependencies
+WORKDIR /app
+
+COPY package*.json .
+
 RUN npm install
 
 # Copy and build TypeScript code
-COPY src/ ./src
-COPY index.ts index.ts
+COPY . .
+
 RUN npm run build
 
-# Stage 2: Final image
-FROM public.ecr.aws/lambda/nodejs:20
+# Stage 3: Final image
+FROM public.ecr.aws/lambda/nodejs:${NODE_VERSION}
+
+WORKDIR ${LAMBDA_TASK_ROOT}
 
 # Install Latex environment and dependencies
 RUN dnf install -y \
   texlive-collection-latexrecommended.noarch \
   texlive-iftex.noarch
 
+# Copy the LaTeX template
+COPY ./src/template.latex template.latex
+
 # Copy built files from previous stage
-WORKDIR ${LAMBDA_TASK_ROOT}
-COPY --from=builder /usr/app/dist/* ./
-COPY --from=builder /usr/bin/pandoc /usr/bin/pandoc
-COPY --from=builder /usr/app/src/template.latex template.latex
+COPY --from=builder /app/dist/* ./
+COPY --from=pandoc /usr/bin/pandoc /usr/bin/pandoc
 
 ENV TEXMFHOME /tmp/texmf
 ENV TEXMFCONFIG /tmp/texmf-config
