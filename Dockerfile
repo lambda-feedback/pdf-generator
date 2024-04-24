@@ -14,7 +14,7 @@ RUN chmod +x /usr/bin/pandoc
 
 # Copy package.json and install dependencies
 WORKDIR /usr/app
-COPY package.json tsconfig.json ./
+COPY package.json .
 RUN npm install
 
 # Copy and build TypeScript code
