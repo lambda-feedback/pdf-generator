@@ -25,10 +25,10 @@ COPY index.ts index.ts
 RUN npm run build
 
 # Stage 2: Final image
-FROM public.ecr.aws/lambda/nodejs:16
+FROM public.ecr.aws/lambda/nodejs:20
 
 # Install Latex environment and dependencies
-RUN yum install -y \
+RUN dnf install -y \
   texlive-collection-latexrecommended.noarch \
   texlive-iftex.noarch
 
