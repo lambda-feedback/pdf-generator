@@ -10,13 +10,11 @@ RUN curl -fsSL https://github.com/jgm/pandoc/releases/download/3.1.13/pandoc-3.1
   && mv /tmp/pandoc-3.1.13/bin/pandoc /usr/bin \
   && rm -rf /tmp/pandoc.tar.gz /tmp/pandoc-3.1.13
 
-RUN /usr/bin/pandoc --help
-
 RUN chmod +x /usr/bin/pandoc
 
 # Copy package.json and install dependencies
 WORKDIR /usr/app
-COPY package.json .
+COPY package.json tsconfig.json package-lock.json ./
 RUN npm install
 
 # Copy and build TypeScript code
@@ -25,10 +23,10 @@ COPY index.ts index.ts
 RUN npm run build
 
 # Stage 2: Final image
-FROM public.ecr.aws/lambda/nodejs:16
+FROM public.ecr.aws/lambda/nodejs:20
 
 # Install Latex environment and dependencies
-RUN yum install -y \
+RUN dnf install -y \
   texlive-collection-latexrecommended.noarch \
   texlive-iftex.noarch
 
