@@ -23,7 +23,7 @@ COPY index.ts index.ts
 RUN npm run build
 
 # Stage 2: Final image
-FROM public.ecr.aws/lambda/nodejs:20
+FROM public.ecr.aws/lambda/nodejs:16
 
 # Install Latex environment and dependencies
 RUN dnf install -y \
