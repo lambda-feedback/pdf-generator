@@ -50,5 +50,9 @@ COPY --from=pandoc /usr/bin/pandoc /usr/bin/pandoc
 
 RUN chmod +x /usr/bin/pandoc
 
+ENV TEXMFHOME /tmp/texmf
+ENV TEXMFCONFIG /tmp/texmf-config
+ENV TEXMFVAR /tmp/texmf-var
+
 # Set the Lambda function handler
 CMD ["index.handler"]
