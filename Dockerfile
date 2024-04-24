@@ -26,7 +26,7 @@ RUN npm run build
 FROM public.ecr.aws/lambda/nodejs:16
 
 # Install Latex environment and dependencies
-RUN dnf install -y \
+RUN yum install -y \
   texlive-collection-latexrecommended.noarch \
   texlive-iftex.noarch
 
