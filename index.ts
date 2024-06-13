@@ -39,11 +39,12 @@ export const handler = async function (
     .toISOString()
     .replace(/[-:T.]/g, "")
     .slice(0, 14);
-  const filename = `${requestData.moduleSlug}_S${humanSetNumber}_${timestamp}.pdf`;
 
+  const filename = `${requestData.moduleSlug}_S${humanSetNumber}_${timestamp}.pdf`;
   const localPath = `/tmp/${filename}`;
-  const s3Path = `${requestData.userId}/${filename}`;
-  let url: string | undefined;
+
+  const filenameTEX = `${requestData.moduleSlug}_S${humanSetNumber}_${timestamp}.tex`;
+  const localPathTEX = `/tmp/${filenameTEX}`;
 
   const pdcTs = new PdcTs();
 
@@ -83,6 +84,20 @@ export const handler = async function (
     };
   }
 
+  // Generate TEX file
+  await pdcTs.Execute({
+    from: "markdown-implicit_figures", // pandoc source format (disabling the implicit_figures extension to remove all image captions)
+    to: "latex", // pandoc output format
+    pandocArgs: [`--template=./template.latex`],
+    spawnOpts: { argv0: "+RTS -M512M -RTS" },
+    outputToFile: true, // Controls whether the output will be returned as a string or written to a file
+    sourceText: markdown, // Use this if your input is a string. If you set this, the file input will be ignored
+    destFilePath: localPathTEX,
+  });
+
+  const s3Path = `${requestData.userId}/${filename}`;
+  let url: string | undefined;
+
   try {
     const region = "eu-west-2";
     const fileStream = fs.createReadStream(localPath);
@@ -96,6 +111,16 @@ export const handler = async function (
 
     const command = new PutObjectCommand(params);
     await s3Client.send(command);
+
+    const s3PathTEX = `${requestData.userId}/${filenameTEX}`;
+    const fileStreamTEX = fs.createReadStream(localPathTEX);
+    const paramsTEX = {
+      Bucket: s3Bucket,
+      Key: s3PathTEX,
+      Body: fileStreamTEX,
+    };
+    const commandTEX = new PutObjectCommand(paramsTEX);
+    await s3Client.send(commandTEX);
 
     url = `https://${s3Bucket}.s3.${region}.amazonaws.com/${s3Path}`;
   } catch (e: unknown) {
