@@ -5,18 +5,11 @@ import { PdcTs } from "pdc-ts";
 import { deleteFile, errorRefiner } from "./src/utils";
 import { z } from "zod";
 
-const FileTypeSchema = z.union([
-  z.literal("PDF"),
-  z.literal("TEX"),
-  z.literal("ALL"),
-]);
-
 export const schema = z.object({
   userId: z.string(),
   markdown: z.string(),
   setNumber: z.number(),
   moduleSlug: z.string(),
-  typeOfFile: FileTypeSchema,
 });
 
 export const handler = async function (
@@ -61,121 +54,118 @@ export const handler = async function (
 
   const markdown = requestData.markdown;
 
-  if (requestData.typeOfFile === "ALL" || requestData.typeOfFile === "PDF") {
-    // Generate PDF file
-    try {
-      await pdcTs.Execute({
-        from: "markdown-implicit_figures", // pandoc source format (disabling the implicit_figures extension to remove all image captions)
-        to: "latex", // pandoc output format
-        pandocArgs: ["--pdf-engine=pdflatex", `--template=./template.latex`],
-        spawnOpts: { argv0: "+RTS -M512M -RTS" },
-        outputToFile: true, // Controls whether the output will be returned as a string or written to a file
-        sourceText: markdown, // Use this if your input is a string. If you set this, the file input will be ignored
-        destFilePath: localPathPDF,
-      });
-    } catch (e: unknown) {
-      if (e instanceof Error) {
-        console.error(e.message);
-      } else {
-        console.error(e);
-      }
-
-      const TeXoutput = await pdcTs.Execute({
-        from: "markdown-implicit_figures", // pandoc source format (disabling the implicit_figures extension to remove all image captions)
-        to: "latex", // pandoc output format
-        pandocArgs: ["--pdf-engine=pdflatex", `--template=./template.latex`],
-        outputToFile: false, // Controls whether the output will be returned as a string or written to a file
-        sourceText: markdown, // Use this if your input is a string. If you set this, the file input will be ignored
-        destFilePath: localPathPDF,
-      });
-
-      // Find the offending text from the error message:
-      e = errorRefiner(String(e), TeXoutput, false);
-
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ e }),
-      };
-    }
-
-    // Save PDF file to S3 bucket
-    try {
-      const fileStream = fs.createReadStream(localPathPDF);
-      const params = {
-        Bucket: s3Bucket,
-        Key: s3PathPDF,
-        Body: fileStream,
-      };
-
-      const command = new PutObjectCommand(params);
-      await s3Client.send(command);
-    } catch (e: unknown) {
-      console.error("S3 upload failed");
-      if (e instanceof Error) {
-        console.error(e.message);
-        return {
-          statusCode: 500,
-          body: e.message,
-        };
-      } else {
-        console.error(e);
-        return {
-          statusCode: 500,
-          body: "S3 Upload failed",
-        };
-      }
-    } finally {
-      // cleanup
-      deleteFile(localPathPDF);
-    }
-  }
-
-  // Generate and save TEX file
-  if (requestData.typeOfFile === "ALL" || requestData.typeOfFile === "TEX") {
-    const filenameTEX = `${requestData.moduleSlug}_S${humanSetNumber}_${timestamp}.tex`;
-    const localPathTEX = `/tmp/${filenameTEX}`;
-
-    // Generate TEX file
+  // Generate PDF file
+  try {
     await pdcTs.Execute({
       from: "markdown-implicit_figures", // pandoc source format (disabling the implicit_figures extension to remove all image captions)
       to: "latex", // pandoc output format
-      pandocArgs: [`--template=./template.latex`],
+      pandocArgs: ["--pdf-engine=pdflatex", `--template=./template.latex`],
       spawnOpts: { argv0: "+RTS -M512M -RTS" },
       outputToFile: true, // Controls whether the output will be returned as a string or written to a file
       sourceText: markdown, // Use this if your input is a string. If you set this, the file input will be ignored
-      destFilePath: localPathTEX,
+      destFilePath: localPathPDF,
+    });
+  } catch (e: unknown) {
+    if (e instanceof Error) {
+      console.error(e.message);
+    } else {
+      console.error(e);
+    }
+
+    const TeXoutput = await pdcTs.Execute({
+      from: "markdown-implicit_figures", // pandoc source format (disabling the implicit_figures extension to remove all image captions)
+      to: "latex", // pandoc output format
+      pandocArgs: ["--pdf-engine=pdflatex", `--template=./template.latex`],
+      outputToFile: false, // Controls whether the output will be returned as a string or written to a file
+      sourceText: markdown, // Use this if your input is a string. If you set this, the file input will be ignored
+      destFilePath: localPathPDF,
     });
 
-    // Save TEX file to S3 bucket
-    try {
-      const s3PathTEX = `${requestData.userId}/${filenameTEX}`;
-      const fileStreamTEX = fs.createReadStream(localPathTEX);
-      const paramsTEX = {
-        Bucket: s3Bucket,
-        Key: s3PathTEX,
-        Body: fileStreamTEX,
+    // Find the offending text from the error message:
+    e = errorRefiner(String(e), TeXoutput, false);
+
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ e }),
+    };
+  }
+
+  // Save PDF file to S3 bucket
+  try {
+    const fileStream = fs.createReadStream(localPathPDF);
+    const params = {
+      Bucket: s3Bucket,
+      Key: s3PathPDF,
+      Body: fileStream,
+    };
+
+    const command = new PutObjectCommand(params);
+    await s3Client.send(command);
+  } catch (e: unknown) {
+    console.error("S3 upload failed");
+    if (e instanceof Error) {
+      console.error(e.message);
+      return {
+        statusCode: 500,
+        body: e.message,
       };
-      const commandTEX = new PutObjectCommand(paramsTEX);
-      await s3Client.send(commandTEX);
-    } catch (e: unknown) {
-      console.error("S3 upload failed");
-      if (e instanceof Error) {
-        console.error(e.message);
-        return {
-          statusCode: 500,
-          body: e.message,
-        };
-      } else {
-        console.error(e);
-        return {
-          statusCode: 500,
-          body: "S3 Upload failed",
-        };
-      }
-    } finally {
-      // cleanup
-      deleteFile(localPathTEX);
+    } else {
+      console.error(e);
+      return {
+        statusCode: 500,
+        body: "S3 Upload failed",
+      };
     }
+  } finally {
+    // cleanup
+    deleteFile(localPathPDF);
+  }
+
+  // Generate and save TEX file
+
+  const filenameTEX = `${requestData.moduleSlug}_S${humanSetNumber}_${timestamp}.tex`;
+  const localPathTEX = `/tmp/${filenameTEX}`;
+
+  // Generate TEX file
+  await pdcTs.Execute({
+    from: "markdown-implicit_figures", // pandoc source format (disabling the implicit_figures extension to remove all image captions)
+    to: "latex", // pandoc output format
+    pandocArgs: [`--template=./template.latex`],
+    spawnOpts: { argv0: "+RTS -M512M -RTS" },
+    outputToFile: true, // Controls whether the output will be returned as a string or written to a file
+    sourceText: markdown, // Use this if your input is a string. If you set this, the file input will be ignored
+    destFilePath: localPathTEX,
+  });
+
+  // Save TEX file to S3 bucket
+  try {
+    const s3PathTEX = `${requestData.userId}/${filenameTEX}`;
+    const fileStreamTEX = fs.createReadStream(localPathTEX);
+    const paramsTEX = {
+      Bucket: s3Bucket,
+      Key: s3PathTEX,
+      Body: fileStreamTEX,
+    };
+    const commandTEX = new PutObjectCommand(paramsTEX);
+    await s3Client.send(commandTEX);
+  } catch (e: unknown) {
+    console.error("S3 upload failed");
+    if (e instanceof Error) {
+      console.error(e.message);
+      return {
+        statusCode: 500,
+        body: e.message,
+      };
+    } else {
+      console.error(e);
+      return {
+        statusCode: 500,
+        body: "S3 Upload failed",
+      };
+    }
+  } finally {
+    // cleanup
+    deleteFile(localPathTEX);
   }
 
   return {
