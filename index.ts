@@ -124,14 +124,10 @@ export const handler = async function (
   for (let eachRequestData of requestData) {
     const markdown = eachRequestData.markdown;
 
-    // These are variables for PDF file only, we need them here for the URL (always points to the PDF)
-    const filenamePDF = `${eachRequestData.fileName}.pdf`;
-    const localPathPDF = `/tmp/${filenamePDF}`;
-    const s3PathPDF = `${eachRequestData.userId}/${filenamePDF}`;
-    url = `https://${s3Bucket}.s3.${region}.amazonaws.com/${s3PathPDF}`;
-
     switch (eachRequestData.typeOfFile) {
       case "PDF":
+        const filenamePDF = `${eachRequestData.fileName}.pdf`;
+        const localPathPDF = `/tmp/${filenamePDF}`;
         const generatePDFResult = await generateFile(
           ["--pdf-engine=pdflatex", `--template=./template.latex`],
           localPathPDF,
@@ -141,8 +137,9 @@ export const handler = async function (
         if (generatePDFResult?.statusCode) {
           return generatePDFResult;
         }
-
+        const s3PathPDF = `${eachRequestData.userId}/${filenamePDF}`;
         await saveFileToS3(localPathPDF, s3PathPDF);
+        url = `https://${s3Bucket}.s3.${region}.amazonaws.com/${s3PathPDF}`;
         break;
       case "TEX":
         const filenameTEX = `${eachRequestData.fileName}.tex`;
