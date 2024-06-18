@@ -5,15 +5,16 @@ import { PdcTs } from "pdc-ts";
 import { deleteFile, errorRefiner } from "./src/utils";
 import { z } from "zod";
 
-const TypeOfFileSchema = z.enum(["PDF", "TEX", "ALL"]);
+const TypeOfFileSchema = z.enum(["PDF", "TEX"]);
 
-export const schema = z.object({
-  userId: z.string(),
-  markdown: z.string(),
-  setNumber: z.number(),
-  moduleSlug: z.string(),
-  typeOfFile: TypeOfFileSchema,
-});
+export const schema = z.array(
+  z.object({
+    userId: z.string(),
+    fileName: z.string(),
+    typeOfFile: TypeOfFileSchema,
+    markdown: z.string(),
+  })
+);
 
 export const handler = async function (
   event: APIGatewayEvent
@@ -37,11 +38,6 @@ export const handler = async function (
   }
 
   const requestData = parsed.data;
-  const humanSetNumber = requestData.setNumber + 1;
-  const timestamp = new Date()
-    .toISOString()
-    .replace(/[-:T.]/g, "")
-    .slice(0, 14);
 
   const region = "eu-west-2";
   const s3Client = new S3Client({ region });
@@ -49,10 +45,12 @@ export const handler = async function (
 
   const pdcTs = new PdcTs();
 
-  const markdown = requestData.markdown;
-
   // Generate file
-  const generateFile = async (pandocArgs: string[], destFilePath: string) => {
+  const generateFile = async (
+    pandocArgs: string[],
+    destFilePath: string,
+    markdown: string
+  ) => {
     try {
       await pdcTs.Execute({
         from: "markdown-implicit_figures", // pandoc source format (disabling the implicit_figures extension to remove all image captions)
@@ -122,34 +120,45 @@ export const handler = async function (
     }
   };
 
-  // These are variables for PDF file only, we need them here for the URL (always points to the PDF)
-  const filenamePDF = `${requestData.moduleSlug}_S${humanSetNumber}_${timestamp}.pdf`;
-  const localPathPDF = `/tmp/${filenamePDF}`;
-  const s3PathPDF = `${requestData.userId}/${filenamePDF}`;
-  const url = `https://${s3Bucket}.s3.${region}.amazonaws.com/${s3PathPDF}`;
+  let url = "";
+  for (let eachRequestData of requestData) {
+    const markdown = eachRequestData.markdown;
 
-  if (requestData.typeOfFile === "PDF" || requestData.typeOfFile === "ALL") {
-    const generatePDFResult = await generateFile(
-      ["--pdf-engine=pdflatex", `--template=./template.latex`],
-      localPathPDF
-    );
+    // These are variables for PDF file only, we need them here for the URL (always points to the PDF)
+    const filenamePDF = `${eachRequestData.fileName}.pdf`;
+    const localPathPDF = `/tmp/${filenamePDF}`;
+    const s3PathPDF = `${eachRequestData.userId}/${filenamePDF}`;
+    url = `https://${s3Bucket}.s3.${region}.amazonaws.com/${s3PathPDF}`;
 
-    if (generatePDFResult?.statusCode) {
-      return generatePDFResult;
+    switch (eachRequestData.typeOfFile) {
+      case "PDF":
+        const generatePDFResult = await generateFile(
+          ["--pdf-engine=pdflatex", `--template=./template.latex`],
+          localPathPDF,
+          markdown
+        );
+
+        if (generatePDFResult?.statusCode) {
+          return generatePDFResult;
+        }
+
+        await saveFileToS3(localPathPDF, s3PathPDF);
+        break;
+      case "TEX":
+        const filenameTEX = `${eachRequestData.fileName}.tex`;
+        const localPathTEX = `/tmp/${filenameTEX}`;
+
+        await generateFile(
+          [`--template=./template.latex`],
+          localPathTEX,
+          markdown
+        );
+
+        const s3PathTEX = `${eachRequestData.userId}/${filenameTEX}`;
+
+        await saveFileToS3(localPathTEX, s3PathTEX);
+        break;
     }
-
-    await saveFileToS3(localPathPDF, s3PathPDF);
-  }
-
-  if (requestData.typeOfFile === "PDF" || requestData.typeOfFile === "ALL") {
-    const filenameTEX = `${requestData.moduleSlug}_S${humanSetNumber}_${timestamp}.tex`;
-    const localPathTEX = `/tmp/${filenameTEX}`;
-
-    await generateFile([`--template=./template.latex`], localPathTEX);
-
-    const s3PathTEX = `${requestData.userId}/${filenameTEX}`;
-
-    await saveFileToS3(localPathTEX, s3PathTEX);
   }
 
   return {
