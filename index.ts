@@ -62,6 +62,7 @@ export const handler = async function (
         destFilePath,
       });
     } catch (e: unknown) {
+      console.error("File generation failed:", destFilePath);
       if (e instanceof Error) {
         console.error(e.message);
       } else {
