@@ -213,6 +213,7 @@ $endif$
 \OldRule{\linewidth}{#2}}% Emile Touber's horizontal rule
 
 \newcommand{\lambdalabel}[1]{}
+\newcommand{\lambdastep}{\\\textcolor[rgb]{0.9, 0.9, 0.9}{\rule{\linewidth}{0.5mm}}\\}
 
 % Conditional inclusion of pifont package
 \IfFileExists{pifont.sty}{%
