@@ -145,7 +145,6 @@ export const handler = async function (
       case "TEX":
         const filenameTEX = `${eachRequestData.fileName}.tex`;
         const localPathTEX = `/tmp/${filenameTEX}`;
-        console.log("Markdown:", markdown);
         await generateFile(
           [`--template=./template.latex`],
           localPathTEX,
