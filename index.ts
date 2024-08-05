@@ -130,7 +130,7 @@ export const handler = async function (
         const filenamePDF = `${eachRequestData.fileName}.pdf`;
         const localPathPDF = `/tmp/${filenamePDF}`;
         const generatePDFResult = await generateFile(
-          ["--pdf-engine=pdflatex", `--template=./template.latex`],
+          ["--pdf-engine=xelatex", `--template=./template.latex`],
           localPathPDF,
           markdown
         );
@@ -145,7 +145,6 @@ export const handler = async function (
       case "TEX":
         const filenameTEX = `${eachRequestData.fileName}.tex`;
         const localPathTEX = `/tmp/${filenameTEX}`;
-
         await generateFile(
           [`--template=./template.latex`],
           localPathTEX,
