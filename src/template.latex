@@ -47,6 +47,11 @@ $if(CJKmainfont)$
     \setCJKmainfont[$for(CJKoptions)$$CJKoptions$$sep$,$endfor$]{$CJKmainfont$}
 $endif$
 \fi
+
+$for(header-includes)$
+  $header-includes$
+$endfor$
+
 % use upquote if available, for straight quotes in verbatim environments
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
 % use microtype if available
@@ -187,9 +192,6 @@ $if(dir)$
   \newenvironment{LTR}{\beginL}{\endL}
 \fi
 $endif$
-$for(header-includes)$
-  - \usepackage{cancel}
-$header-includes$
 $endfor$
 
 $if(title)$
