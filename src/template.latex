@@ -49,7 +49,7 @@ $endif$
 \fi
 
 $for(header-includes)$
-  $header-includes$
+  - \usepackage{cancel}
 $endfor$
 
 % use upquote if available, for straight quotes in verbatim environments
