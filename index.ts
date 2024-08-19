@@ -130,12 +130,7 @@ export const handler = async function (
         const filenamePDF = `${eachRequestData.fileName}.pdf`;
         const localPathPDF = `/tmp/${filenamePDF}`;
         const generatePDFResult = await generateFile(
-          [
-            "--pdf-engine=xelatex",
-            "--template=./template.latex",
-            "--variable",
-            "header-includes:\n\\usepackage{cancel}\n\\usepackage{fancyhdr}\n\\usepackage{lipsum}",
-          ],
+          ["--pdf-engine=xelatex", "--template=./template.latex"],
           localPathPDF,
           markdown
         );
@@ -151,11 +146,7 @@ export const handler = async function (
         const filenameTEX = `${eachRequestData.fileName}.tex`;
         const localPathTEX = `/tmp/${filenameTEX}`;
         await generateFile(
-          [
-            "--template=./template.latex",
-            "--variable",
-            "header-includes:\n\\usepackage{cancel}\n\\usepackage{fancyhdr}\n\\usepackage{lipsum}",
-          ],
+          ["--template=./template.latex"],
           localPathTEX,
           markdown
         );
