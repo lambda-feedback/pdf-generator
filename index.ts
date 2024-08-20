@@ -45,6 +45,17 @@ export const handler = async function (
 
   const pdcTs = new PdcTs();
 
+  // Create writable directory for Pandoc generation
+  const fontconfigPath = "/tmp/fontconfig";
+
+  // Create the directory if it doesn't exist
+  if (!fs.existsSync(fontconfigPath)) {
+    fs.mkdirSync(fontconfigPath);
+  }
+
+  // Set the FONTCONFIG_PATH environment variable
+  process.env.FONTCONFIG_PATH = fontconfigPath;
+
   // Generate file
   const generateFile = async (
     pandocArgs: string[],
