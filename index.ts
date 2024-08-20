@@ -80,13 +80,14 @@ export const handler = async function (
         console.error(e);
       }
 
+      const localPathLOG = destFilePath + ".log";
       const TeXoutput = await pdcTs.Execute({
         from: "markdown-implicit_figures", // pandoc source format (disabling the implicit_figures extension to remove all image captions)
         to: "latex", // pandoc output format
         pandocArgs,
-        outputToFile: false, // Controls whether the output will be returned as a string or written to a file
+        outputToFile: true, // Controls whether the output will be returned as a string or written to a file
         sourceText: markdown, // Use this if your input is a string. If you set this, the file input will be ignored
-        destFilePath,
+        destFilePath: localPathLOG,
       });
 
       // Find the offending text from the error message:
