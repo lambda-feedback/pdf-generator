@@ -80,18 +80,24 @@ export const handler = async function (
         console.error(e);
       }
 
-      const TeXoutput = await pdcTs.Execute({
-        from: "markdown-implicit_figures", // pandoc source format (disabling the implicit_figures extension to remove all image captions)
-        to: "latex", // pandoc output format
-        pandocArgs,
-        spawnOpts: { argv0: "+RTS -M512M -RTS" },
-        outputToFile: true, // Controls whether the output will be returned as a string or written to a file
-        sourceText: markdown, // Use this if your input is a string. If you set this, the file input will be ignored
-        destFilePath,
-      });
+      let TeXoutput;
+      try {
+        TeXoutput = await pdcTs.Execute({
+          from: "markdown-implicit_figures", // pandoc source format (disabling the implicit_figures extension to remove all image captions)
+          to: "latex", // pandoc output format
+          pandocArgs,
+          outputToFile: false, // Controls whether the output will be returned as a string or written to a file
+          sourceText: markdown, // Use this if your input is a string. If you set this, the file input will be ignored
+          destFilePath,
+        });
+      } catch (e: unknown) {
+        console.error("Pandoc execution to refine error failed:", e);
+      }
 
       // Find the offending text from the error message:
-      e = errorRefiner(String(e), TeXoutput, false);
+      if (TeXoutput) {
+        e = errorRefiner(String(e), TeXoutput, false);
+      }
 
       console.error("Offending text:", e);
 
