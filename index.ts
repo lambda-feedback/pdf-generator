@@ -46,7 +46,7 @@ export const handler = async function (
   const pdcTs = new PdcTs();
 
   // Create writable directory for Pandoc generation
-  const fontconfigPath = "/tmp/fontconfig";
+  const fontconfigPath = "/tmp";
 
   // Create the directory if it doesn't exist
   if (!fs.existsSync(fontconfigPath)) {
@@ -82,6 +82,7 @@ export const handler = async function (
 
       let TeXoutput;
       try {
+        console.error("Running PDF genertion again to try to refine the error");
         TeXoutput = await pdcTs.Execute({
           from: "markdown-implicit_figures", // pandoc source format (disabling the implicit_figures extension to remove all image captions)
           to: "latex", // pandoc output format
