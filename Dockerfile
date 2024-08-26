@@ -31,27 +31,29 @@ COPY . .
 
 RUN npm run build
 
-# Stage 3: Final image
+# Stage 3: Final image with LaTeX and pandoc
 FROM public.ecr.aws/lambda/nodejs:${NODE_VERSION}
 
+# Set working directory
 WORKDIR ${LAMBDA_TASK_ROOT}
 
-# Install Latex environment and dependencies
+# Install LaTeX environment and dependencies
 RUN dnf install -y \
   texlive-collection-latexrecommended.noarch \
-  texlive-iftex.noarch
-
-# Add library to handle cancel
-FROM texlive/texlive
-RUN tlmgr install cancel braket
+  texlive-iftex.noarch \
+  texlive-braket.noarch \
+  texlive-cancel.noarch
 
 # Copy the LaTeX template
 COPY ./src/template.latex template.latex
 
-# Copy built files from previous stage
+# Copy built files from the previous stage
 COPY --from=builder /app/dist/* ./
+
+# Copy pandoc from the first stage
 COPY --from=pandoc /usr/bin/pandoc /usr/bin/pandoc
 
+# Set environment variables
 ENV TEXMFHOME /tmp/texmf
 ENV TEXMFCONFIG /tmp/texmf-config
 ENV TEXMFVAR /tmp/texmf-var
