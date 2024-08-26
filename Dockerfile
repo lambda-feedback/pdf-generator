@@ -41,6 +41,10 @@ RUN dnf install -y \
   texlive-collection-latexrecommended.noarch \
   texlive-iftex.noarch
 
+# Add library to handle cancel
+FROM texlive/texlive
+RUN tlmgr install cancel braket
+
 # Copy the LaTeX template
 COPY ./src/template.latex template.latex
 
