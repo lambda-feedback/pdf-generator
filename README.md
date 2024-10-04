@@ -23,7 +23,7 @@
 ## Using curl
 
 ```bash
-curl --location 'http://localhost:9000/2015-03-31/functions/function/invocations' --header 'Content-Type: application/json' --data '{ "userId":"c82da7d4-3295-4c4a-921b-7000d65224b6", "markdown":"hi from local", "moduleSlug":"test_slug",  "setNumber":1}'
+curl --location 'http://localhost:9000/2015-03-31/functions/function/invocations' --header 'Content-Type: application/json' --data '{ "userId":"c82da7d4-3295-4c4a-921b-7000d65224b6", "fileName": "my_set_pdf", "typeOfFile":"PDF", "markdown":"hi from local"}'
 ```
 
 ## From postman
@@ -35,12 +35,20 @@ http://localhost:9000/2015-03-31/functions/function/invocations
 
 body:
 ```json
-{
-    "userId":"c82da7d4-3295-4c4a-921b-7000d65224b6",
-    "markdown":"hi from postman staging",
-    "moduleSlug":"test_slug", 
-    "setNumber":1
-}
+[
+    {
+        "userId":"c82da7d4-3295-4c4a-921b-7000d65224b6",
+        "fileName": "pokus_pdf",
+        "typeOfFile":"PDF",
+        "markdown":"hi from postman staging pdf"
+    },
+    {
+        "userId":"c82da7d4-3295-4c4a-921b-7000d65224b6",
+        "fileName": "pokus_tex",
+        "typeOfFile":"TEX",
+        "markdown":"hi from postman staging tex"
+    }
+]
 ```
 
 
