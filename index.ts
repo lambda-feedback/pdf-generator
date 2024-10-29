@@ -37,7 +37,9 @@ export const handler = async function (
     };
   }
 
-  // add here env variables
+  // Set up writable cache directories for Fontconfig in the /tmp directory
+  process.env.FONTCONFIG_PATH = "/tmp";
+  process.env.FONTCONFIG_FILE = "/tmp/fonts.conf";
 
   const requestData = parsed.data;
 
