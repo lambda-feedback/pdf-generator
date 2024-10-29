@@ -37,6 +37,8 @@ export const handler = async function (
     };
   }
 
+  // add here env variables
+
   const requestData = parsed.data;
 
   const region = "eu-west-2";
