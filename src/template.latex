@@ -215,7 +215,7 @@ $endif$
 
 \usepackage{xcolor}
 \newcommand{\lambdalabel}[1]{}
-\newcommand{\lambdastep}{\\\textcolor[rgb]{0.9, 0.9, 0.9}{\rule{\linewidth}{0.5mm}}\\}
+\newcommand{\lambdastep}{\ifhmode\\\else\leavevmode\fi\textcolor[rgb]{0.9, 0.9, 0.9}{\rule{\linewidth}{0.5mm}}\par\nobreak}
 
 % Conditional inclusion of pifont package
 \IfFileExists{pifont.sty}{%
