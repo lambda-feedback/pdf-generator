@@ -192,10 +192,6 @@ $for(header-includes)$
 $header-includes$
 $endfor$
 
-$for(header-includes)$
-$header-includes$
-$endfor$
-
 % Add table-related LaTeX settings
 \usepackage{longtable,booktabs,array}
 \usepackage{calc}
