@@ -192,6 +192,15 @@ $for(header-includes)$
 $header-includes$
 $endfor$
 
+% Add table-related LaTeX settings
+\usepackage{longtable,booktabs,array}
+\usepackage{calc}
+\renewcommand{\arraystretch}{1.2} % Adjust row height
+\setlength{\tabcolsep}{4pt} % Adjust column spacing
+
+% Define new column types for wrapping text with fixed widths
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1\textwidth}} % Left-aligned with wrapping
+
 $if(title)$
 \title{$title$$if(thanks)$\thanks{$thanks$}$endif$}
 $endif$
