@@ -223,6 +223,9 @@ $endif$
 \OldRule{\linewidth}{#2}}% Emile Touber's horizontal rule
 
 \usepackage{xcolor}
+\newcommand{\degree}{^\circ} % Katex commands
+\newcommand{\infin}{\infty}  % Katex commands
+
 \newcommand{\lambdalabel}[1]{}
 \newcommand{\lambdastep}{\ifhmode\\\else\leavevmode\fi\textcolor[rgb]{0.9, 0.9, 0.9}{\rule{\linewidth}{0.5mm}}\par\nobreak}
 
