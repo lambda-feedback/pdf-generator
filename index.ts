@@ -61,7 +61,8 @@ export const handler = async function (
   ) => {
     // pandoc source format 
     // If Milkdown, disable the implicit_figures extension to remove all image captions
-    const fromString = isMilkdown ? "markdown-implicit_figures" : "markdown";
+    // const fromString = isMilkdown ? "markdown-implicit_figures" : "markdown";
+    const fromString = isMilkdown ? "markdown";
 
     try {
       await pdcTs.Execute({
