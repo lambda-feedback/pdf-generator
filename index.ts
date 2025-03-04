@@ -136,7 +136,7 @@ export const handler = async function (
   let url = "";
   for (let eachRequestData of requestData) {
     const markdown = eachRequestData.markdown;
-    const implicitFigures = true;
+    const implicitFigures = eachRequestData.implicitFigures;
 
     switch (eachRequestData.typeOfFile) {
       case "PDF":
