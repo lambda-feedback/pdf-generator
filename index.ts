@@ -13,7 +13,7 @@ export const schema = z.array(
     fileName: z.string(),
     typeOfFile: TypeOfFileSchema,
     markdown: z.string(),
-    isMilkdown: z.boolean().optional(),
+    implicitFigures: z.boolean().optional(),
   })
 );
 
@@ -57,12 +57,11 @@ export const handler = async function (
     pandocArgs: string[],
     destFilePath: string,
     markdown: string,
-    isMilkdown: boolean = true
+    implicitFigures: boolean = false
   ) => {
     // pandoc source format 
-    // If Milkdown, disable the implicit_figures extension to remove all image captions
-    const fromString = isMilkdown ? "markdown-implicit_figures" : "markdown+implicit_figures";
-    // const fromString = "markdown+implicit_figures";
+    // If implicitFigures, enable the implicit_figures extension and add image captions
+    const fromString = implicitFigures ? "markdown+implicit_figures" : "markdown-implicit_figures";
 
     try {
       await pdcTs.Execute({
@@ -137,7 +136,7 @@ export const handler = async function (
   let url = "";
   for (let eachRequestData of requestData) {
     const markdown = eachRequestData.markdown;
-    const isMilkdown = eachRequestData.isMilkdown;
+    const implicitFigures = eachRequestData.implicitFigures;
 
     switch (eachRequestData.typeOfFile) {
       case "PDF":
@@ -147,7 +146,7 @@ export const handler = async function (
           ["--pdf-engine=xelatex", `--template=./template.latex`],
           localPathPDF,
           markdown,
-          isMilkdown
+          implicitFigures
         );
 
         if (generatePDFResult?.statusCode) {
@@ -164,7 +163,7 @@ export const handler = async function (
           [`--template=./template.latex`],
           localPathTEX,
           markdown,
-          isMilkdown
+          implicitFigures
         );
 
         const s3PathTEX = `${eachRequestData.userId}/${filenameTEX}`;
