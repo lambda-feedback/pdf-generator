@@ -220,6 +220,10 @@ $endif$
 \usepackage{float}
 \floatplacement{figure}{H}
 
+% Remove "Figure X." prefix from captions
+\usepackage{caption}
+\captionsetup[figure]{labelformat=empty}
+
 % Lambda customisation
 
 \let\OldRule\rule
