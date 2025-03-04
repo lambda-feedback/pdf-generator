@@ -13,6 +13,7 @@ export const schema = z.array(
     fileName: z.string(),
     typeOfFile: TypeOfFileSchema,
     markdown: z.string(),
+    isMilkdown: z.boolean().optional(),
   })
 );
 
@@ -55,11 +56,17 @@ export const handler = async function (
   const generateFile = async (
     pandocArgs: string[],
     destFilePath: string,
-    markdown: string
+    markdown: string,
+    isMilkdown: boolean = true
   ) => {
+    // pandoc source format 
+    // If Milkdown, disable the implicit_figures extension to remove all image captions
+    const fromString = isMilkdown ? "markdown-implicit_figures" : "markdown+implicit_figures";
+    // const fromString = "markdown+implicit_figures";
+
     try {
       await pdcTs.Execute({
-        from: "markdown-implicit_figures", // pandoc source format (disabling the implicit_figures extension to remove all image captions)
+        from: fromString,
         to: "latex", // pandoc output format
         pandocArgs,
         spawnOpts: { argv0: "+RTS -M512M -RTS" },
@@ -76,7 +83,7 @@ export const handler = async function (
       }
 
       const TeXoutput = await pdcTs.Execute({
-        from: "markdown-implicit_figures", // pandoc source format (disabling the implicit_figures extension to remove all image captions)
+        from: fromString, 
         to: "latex", // pandoc output format
         pandocArgs,
         outputToFile: false, // Controls whether the output will be returned as a string or written to a file
@@ -130,6 +137,7 @@ export const handler = async function (
   let url = "";
   for (let eachRequestData of requestData) {
     const markdown = eachRequestData.markdown;
+    const isMilkdown = eachRequestData.isMilkdown;
 
     switch (eachRequestData.typeOfFile) {
       case "PDF":
@@ -138,7 +146,8 @@ export const handler = async function (
         const generatePDFResult = await generateFile(
           ["--pdf-engine=xelatex", `--template=./template.latex`],
           localPathPDF,
-          markdown
+          markdown,
+          isMilkdown
         );
 
         if (generatePDFResult?.statusCode) {
@@ -154,7 +163,8 @@ export const handler = async function (
         await generateFile(
           [`--template=./template.latex`],
           localPathTEX,
-          markdown
+          markdown,
+          isMilkdown
         );
 
         const s3PathTEX = `${eachRequestData.userId}/${filenameTEX}`;

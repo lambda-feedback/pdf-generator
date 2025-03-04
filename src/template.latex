@@ -216,6 +216,10 @@ $if(institute)$
 $endif$
 \date{$date$}
 
+% Set images to stay in place
+\usepackage{float}
+\floatplacement{figure}{H}
+
 % Lambda customisation
 
 \let\OldRule\rule
