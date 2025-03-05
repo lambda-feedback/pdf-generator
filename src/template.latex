@@ -220,21 +220,18 @@ $endif$
 \usepackage{float}
 \floatplacement{figure}{H}
 
-% Wrap includegaphics in figures with centering...
+% Centre images
 \usepackage{etoolbox}  % For toggle functionality
 
 \newtoggle{infigure} % Create toggle to track if we're inside a figure environment
 \togglefalse{infigure}  % Initialize as false
 
-% Set toggle when entering/exiting figure environments
-\pretocmd{\figure}{\toggletrue{infigure}}{}{}
+\pretocmd{\figure}{\toggletrue{infigure}}{}{} % Set toggle when entering/exiting figure environments
 \apptocmd{\endfigure}{\togglefalse{infigure}}{}{}
 
-% Save the original includegraphics command
-\let\oldincludegraphics\includegraphics
+\let\oldincludegraphics\includegraphics % Save the original includegraphics command
 
-% Redefine includegraphics to check if it's already in a figure
-\renewcommand{\includegraphics}[2][]{%
+\renewcommand{\includegraphics}[2][]{ % Redefine includegraphics to check if it's already in a figure
   \iftoggle{infigure}{%
     \oldincludegraphics[#1]{#2}%
   }{%
