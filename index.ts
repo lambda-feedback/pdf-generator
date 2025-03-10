@@ -59,13 +59,23 @@ export const handler = async function (
     markdown: string,
     implicitFigures: boolean = false
   ) => {
-    // pandoc source format 
-    // If implicitFigures, enable the implicit_figures extension and add image captions
-    const fromString = implicitFigures ? "markdown+implicit_figures" : "markdown-implicit_figures";
+    // Use standard Pandoc style via format name `markdown` 
+    // (see https://pandoc.org/chunkedhtml-demo/3.1-general-options.html)
+    //
+    // The "+implicit_figures" extension wraps images in figures and uses the image's alt text as the caption.
+    // NOTE: The "Figure X." prefix is removed in the LaTeX template via:
+    // ```tex
+    // % Remove "Figure X." prefix from captions
+    // \usepackage{caption}
+    // \captionsetup[figure]{labelformat=empty}
+    // ```
+    //
+    // If `implicitFigures`, enable the `implicit_figures`, disable otherwise...
+    const formatName = implicitFigures ? "markdown+implicit_figures" : "markdown-implicit_figures";
 
     try {
       await pdcTs.Execute({
-        from: fromString,
+        from: formatName,
         to: "latex", // pandoc output format
         pandocArgs,
         spawnOpts: { argv0: "+RTS -M512M -RTS" },
@@ -82,7 +92,7 @@ export const handler = async function (
       }
 
       const TeXoutput = await pdcTs.Execute({
-        from: fromString, 
+        from: formatName, 
         to: "latex", // pandoc output format
         pandocArgs,
         outputToFile: false, // Controls whether the output will be returned as a string or written to a file
