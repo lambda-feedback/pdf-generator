@@ -229,19 +229,6 @@ $endif$
 \pretocmd{\figure}{\toggletrue{infigure}}{}{} % Set toggle when entering/exiting figure environments
 \apptocmd{\endfigure}{\togglefalse{infigure}}{}{}
 
-\let\oldincludegraphics\includegraphics % Save the original includegraphics command
-
-\renewcommand{\includegraphics}[2][]{ % Redefine includegraphics to check if it's already in a figure
-  \iftoggle{infigure}{%
-    \oldincludegraphics[#1]{#2}%
-  }{%
-    \begin{figure}
-      \centering
-      \oldincludegraphics[#1]{#2}
-    \end{figure}%
-  }%
-}
-
 % Remove "Figure X." prefix from captions
 \usepackage{caption}
 \captionsetup[figure]{labelformat=empty}
