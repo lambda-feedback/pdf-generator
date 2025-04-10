@@ -125,13 +125,23 @@ $endif$
 $if(graphics)$
 \usepackage{graphicx,grffile}
 \makeatletter
-\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
-\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
-\makeatother
-% Scale images if necessary, so that they will not overflow the page
-% margins by default, and it is still possible to overwrite the defaults
-% using explicit options in \includegraphics[width, height, ...]{}
-\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+
+% Updating our template following changes to Pandoc
+% https://github.com/jgm/pandoc/pull/9666/files
+
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+
+% End update
+
 $endif$
 $if(links-as-notes)$
 % Make links footnotes instead of hotlinks:
@@ -219,28 +229,6 @@ $endif$
 % Set images to stay in place
 \usepackage{float}
 \floatplacement{figure}{H}
-
-% Centre images
-\usepackage{etoolbox}  % For toggle functionality
-
-\newtoggle{infigure} % Create toggle to track if we're inside a figure environment
-\togglefalse{infigure}  % Initialize as false
-
-\pretocmd{\figure}{\toggletrue{infigure}}{}{} % Set toggle when entering/exiting figure environments
-\apptocmd{\endfigure}{\togglefalse{infigure}}{}{}
-
-\let\oldincludegraphics\includegraphics % Save the original includegraphics command
-
-\renewcommand{\includegraphics}[2][]{ % Redefine includegraphics to check if it's already in a figure
-  \iftoggle{infigure}{%
-    \oldincludegraphics[#1]{#2}%
-  }{%
-    \begin{figure}
-      \centering
-      \oldincludegraphics[#1]{#2}
-    \end{figure}%
-  }%
-}
 
 % Remove "Figure X." prefix from captions
 \usepackage{caption}
