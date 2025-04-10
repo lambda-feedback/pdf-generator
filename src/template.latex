@@ -221,13 +221,13 @@ $endif$
 \floatplacement{figure}{H}
 
 % Centre images
-\usepackage{etoolbox}  % For toggle functionality
-
-\newtoggle{infigure} % Create toggle to track if we're inside a figure environment
-\togglefalse{infigure}  % Initialize as false
-
-\pretocmd{\figure}{\toggletrue{infigure}}{}{} % Set toggle when entering/exiting figure environments
-\apptocmd{\endfigure}{\togglefalse{infigure}}{}{}
+\let\oldincludegraphics\includegraphics
+ 
+\renewcommand{\includegraphics}[2][]{%
+  \begin{center}
+    \oldincludegraphics[#1]{#2}%
+  \end{center}
+}
 
 % Remove "Figure X." prefix from captions
 \usepackage{caption}
