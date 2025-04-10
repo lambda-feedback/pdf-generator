@@ -220,15 +220,6 @@ $endif$
 \usepackage{float}
 \floatplacement{figure}{H}
 
-% Centre images
-\let\oldincludegraphics\includegraphics
- 
-\renewcommand{\includegraphics}[2][]{%
-  \begin{center}
-    \oldincludegraphics[#1]{#2}%
-  \end{center}
-}
-
 % Remove "Figure X." prefix from captions
 \usepackage{caption}
 \captionsetup[figure]{labelformat=empty}
