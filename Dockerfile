@@ -3,7 +3,7 @@ ARG NODE_VERSION=20
 # Stage 1: Install pandoc
 FROM public.ecr.aws/lambda/nodejs:${NODE_VERSION} as pandoc
 
-ARG PANDOC_VERSION=3.1.13
+ARG PANDOC_VERSION=3.6.4
 
 # Install tar and gzip
 RUN dnf install -y tar gzip
