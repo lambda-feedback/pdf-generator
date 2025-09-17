@@ -260,9 +260,8 @@ $endif$
 
 
 \usepackage[a4paper,top=2cm,bottom=2cm,left=2cm,right=2cm]{geometry}%
-\usepackage{lmodern}%                     font style must be sans serif to
-\renewcommand*\familydefault{\sfdefault}% comply with the college's regulations
-\usepackage[T1]{fontenc}%                 with respect to disabilities!
+\usepackage{lmodern}%                     font style must be sans serif to comply with
+\renewcommand*\familydefault{\sfdefault}% the college's regulations with respect to disabilities!
 
 
 \begin{document}
