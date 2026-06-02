@@ -52,6 +52,40 @@ body:
 ```
 
 
+## Testing
+
+### Dependencies
+
+In addition to the runtime dependencies above, running the full test suite locally requires:
+
+- [Pandoc](https://pandoc.org/installing.html) — for integration tests that verify markdown → LaTeX conversion
+- A TeX Live distribution with **xelatex** — for compile tests that produce real PDFs
+- [poppler-utils](https://poppler.freedesktop.org/) (`pdftotext`) — for content verification of compiled PDFs
+
+On macOS these can be installed via Homebrew:
+```bash
+brew install pandoc mactex poppler
+```
+
+### Running tests
+
+```bash
+yarn test          # type-check + all tests
+yarn test:unit     # unit and integration tests only
+yarn test:types    # TypeScript type-check only
+```
+
+### Test structure
+
+| File | Type | What it tests |
+|---|---|---|
+| `src/utils.test.ts` | Unit | `fixInlineLatex`, `errorRefiner`, `deleteFile` — pure function logic |
+| `index.test.ts` | Unit | Zod schema validation and Lambda handler routing (Pandoc mocked) |
+| `src/pandoc.test.ts` | Integration | Real Pandoc: markdown → LaTeX fragment output, math, `implicit_figures`, Unicode |
+| `src/compile.test.ts` | End-to-end | Full pipeline: Pandoc + `template.latex` + xelatex → PDF; content verified with `pdftotext` |
+
+The compile tests take ~5–15 seconds each as they invoke xelatex.
+
 ## More information
 
 https://github.com/lambda-feedback/technical-documentation/blob/main/docs/pdf_generator/index.md
