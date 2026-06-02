@@ -77,4 +77,37 @@ describe("Pandoc markdown → LaTeX output", () => {
       expect(latex).toContain("\\(x + y\\)");
     });
   });
+
+  describe("unicode characters", () => {
+    it("passes Greek letters in prose through to LaTeX", async () => {
+      const latex = await toLatex("Lowercase: α, β, γ, Δ, Σ");
+      expect(latex).toContain("α");
+      expect(latex).toContain("Δ");
+    });
+
+    it("converts en dash to -- in LaTeX output", async () => {
+      // Pandoc's smart extension normalises the Unicode en dash to --
+      const latex = await toLatex("pages 10–20");
+      expect(latex).toContain("--");
+    });
+
+    it("converts em dash to --- in LaTeX output", async () => {
+      // Pandoc's smart extension normalises the Unicode em dash to ---
+      const latex = await toLatex("remark—here");
+      expect(latex).toContain("---");
+    });
+
+    it("preserves Greek math commands in LaTeX output", async () => {
+      const latex = await toLatex("$\\alpha + \\beta = \\gamma$");
+      expect(latex).toContain("\\alpha");
+    });
+
+    it("handles mixed prose Unicode and LaTeX math commands", async () => {
+      const latex = await toLatex(
+        "Unicode Greek: α, β. Discriminant $\\Delta = b^2 - 4ac$."
+      );
+      expect(latex).toContain("α");
+      expect(latex).toContain("\\Delta");
+    });
+  });
 });
