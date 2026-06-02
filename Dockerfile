@@ -43,7 +43,8 @@ RUN dnf install -y \
   texlive-iftex.noarch \
   texlive-braket.noarch \
   texlive-cancel.noarch \
-  texlive-xecjk.noarch
+  texlive-xecjk.noarch \
+  unzip
 
 # Install Noto Sans fonts: base (Latin/Greek/Cyrillic) + CJK (Korean/Chinese/Japanese)
 # These are the default fonts used by the template for broad Unicode coverage.
