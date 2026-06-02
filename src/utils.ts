@@ -68,8 +68,7 @@ export const errorRefiner = (
 
   // Locate the error in the TeX file and identify the section
   let errorLocationInContents =
-    contentsPage.findIndex((element) => element[0] >= Number(errorLineString)) -
-      1 ?? 0;
+    contentsPage.findIndex((element) => element[0] >= Number(errorLineString)) - 1;
   if (errorLocationInContents == -2) {
     // If the location wasn't found, then plant and return the message in the last row.
     contentsPage.push([contentsPage.length + 1, "Location not identified."]);
