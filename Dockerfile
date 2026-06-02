@@ -43,7 +43,8 @@ RUN dnf install -y \
   texlive-iftex.noarch \
   texlive-braket.noarch \
   texlive-cancel.noarch \
-  texlive-xecjk.noarch
+  texlive-xecjk.noarch \
+  texlive-ctex.noarch
 
 # Install Noto Sans fonts for Unicode rendering (Latin/Greek/Cyrillic + CJK)
 RUN dnf install -y \
