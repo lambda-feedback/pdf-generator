@@ -14,6 +14,7 @@ export const schema = z.array(
     typeOfFile: TypeOfFileSchema,
     markdown: z.string(),
     implicitFigures: z.boolean().optional(),
+    variables: z.record(z.string(), z.string()).optional(),
   })
 );
 
@@ -147,13 +148,15 @@ export const handler = async function (
   for (let eachRequestData of requestData) {
     const markdown = eachRequestData.markdown;
     const implicitFigures = eachRequestData.implicitFigures;
+    const variableArgs = Object.entries(eachRequestData.variables ?? {})
+      .map(([k, v]) => `--variable=${k}:${v}`);
 
     switch (eachRequestData.typeOfFile) {
       case "PDF":
         const filenamePDF = `${eachRequestData.fileName}.pdf`;
         const localPathPDF = `/tmp/${filenamePDF}`;
         const generatePDFResult = await generateFile(
-          ["--pdf-engine=xelatex", `--template=./template.latex`],
+          ["--pdf-engine=xelatex", `--template=./template.latex`, ...variableArgs],
           localPathPDF,
           markdown,
           implicitFigures
@@ -170,7 +173,7 @@ export const handler = async function (
         const filenameTEX = `${eachRequestData.fileName}.tex`;
         const localPathTEX = `/tmp/${filenameTEX}`;
         await generateFile(
-          [`--template=./template.latex`],
+          [`--template=./template.latex`, ...variableArgs],
           localPathTEX,
           markdown,
           implicitFigures

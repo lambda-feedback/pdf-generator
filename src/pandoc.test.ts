@@ -78,6 +78,21 @@ describe("Pandoc markdown → LaTeX output", () => {
     });
   });
 
+  describe("pandoc variables", () => {
+    it("accepts a --variable flag without error", async () => {
+      // Verifies the variable-passing mechanism works; mainfont is a safe no-op variable
+      // since the template only applies it under XeLaTeX, which isn't invoked here
+      const latex = await new PdcTs().Execute({
+        from: "markdown",
+        to: "latex",
+        outputToFile: false,
+        sourceText: "# Hello",
+        pandocArgs: ["--variable=mainfont:Latin Modern Roman"],
+      });
+      expect(latex).toContain("\\section{Hello}");
+    });
+  });
+
   describe("unicode characters", () => {
     it("passes Greek letters in prose through to LaTeX", async () => {
       const latex = await toLatex("Lowercase: α, β, γ, Δ, Σ");

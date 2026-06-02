@@ -42,7 +42,22 @@ RUN dnf install -y \
   texlive-collection-latexrecommended.noarch \
   texlive-iftex.noarch \
   texlive-braket.noarch \
-  texlive-cancel.noarch
+  texlive-cancel.noarch \
+  texlive-xecjk.noarch
+
+# Install Noto Sans fonts: base (Latin/Greek/Cyrillic) + CJK (Korean/Chinese/Japanese)
+# These are the default fonts used by the template for broad Unicode coverage.
+RUN curl -fsSL https://github.com/notofonts/latin-greek-cyrillic/releases/download/NotoSans-v2.013/NotoSans-v2.013.zip \
+      -o /tmp/NotoSans.zip \
+  && unzip -j /tmp/NotoSans.zip "*/unhinted/ttf/NotoSans-Regular.ttf" \
+                                "*/unhinted/ttf/NotoSans-Bold.ttf" \
+                                "*/unhinted/ttf/NotoSans-Italic.ttf" \
+                                "*/unhinted/ttf/NotoSans-BoldItalic.ttf" \
+      -d /usr/share/fonts/noto \
+  && rm /tmp/NotoSans.zip \
+  && curl -fsSL https://github.com/googlefonts/noto-cjk/releases/download/Sans2.004R/NotoSansCJKkr-Regular.otf \
+      -o /usr/share/fonts/noto/NotoSansCJKkr-Regular.otf \
+  && fc-cache -fv
 
 # Copy the LaTeX template
 COPY ./src/template.latex template.latex

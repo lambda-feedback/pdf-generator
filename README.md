@@ -65,6 +65,7 @@ In addition to the runtime dependencies above, running the full test suite local
 On macOS these can be installed via Homebrew:
 ```bash
 brew install pandoc mactex poppler
+brew install --cask font-noto-sans font-noto-sans-cjk
 ```
 
 ### Running tests

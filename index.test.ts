@@ -52,6 +52,16 @@ describe("schema", () => {
     const data = { userId: "u1", fileName: "doc", typeOfFile: "PDF", markdown: "text" };
     expect(schema.safeParse(data).success).toBe(false);
   });
+
+  it("validates a request with a variables map", () => {
+    const data = [{ userId: "u1", fileName: "doc", typeOfFile: "PDF", markdown: "text", variables: { lang: "ko", CJKmainfont: "Noto Sans CJK KR" } }];
+    expect(schema.safeParse(data).success).toBe(true);
+  });
+
+  it("rejects variables with non-string values", () => {
+    const data = [{ userId: "u1", fileName: "doc", typeOfFile: "PDF", markdown: "text", variables: { lang: 42 } }];
+    expect(schema.safeParse(data).success).toBe(false);
+  });
 });
 
 describe("handler", () => {
@@ -93,6 +103,18 @@ describe("handler", () => {
     const event = [{ userId: "user1", fileName: "test-doc", typeOfFile: "TEX", markdown: "# Hello" }];
     const result = await handler(event as any);
     expect(result.statusCode).toBe(200);
+  });
+
+  it("passes variables as --variable flags to Pandoc", async () => {
+    const executeMock = vi.fn().mockResolvedValue("");
+    vi.mocked(PdcTs).mockImplementationOnce(() => ({ Execute: executeMock }) as any);
+
+    const event = [{ userId: "user1", fileName: "test-doc", typeOfFile: "TEX", markdown: "# Hello", variables: { lang: "ko", CJKmainfont: "Noto Sans CJK KR" } }];
+    await handler(event as any);
+
+    const calledArgs: string[] = executeMock.mock.calls[0]?.[0]?.pandocArgs ?? [];
+    expect(calledArgs).toContain("--variable=lang:ko");
+    expect(calledArgs).toContain("--variable=CJKmainfont:Noto Sans CJK KR");
   });
 
   it("returns 500 when Pandoc execution fails", async () => {
