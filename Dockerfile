@@ -42,7 +42,15 @@ RUN dnf install -y \
   texlive-collection-latexrecommended.noarch \
   texlive-iftex.noarch \
   texlive-braket.noarch \
-  texlive-cancel.noarch
+  texlive-cancel.noarch \
+  texlive-xecjk.noarch \
+  texlive-ctex.noarch
+
+# Install Noto Sans fonts for Unicode rendering (Latin/Greek/Cyrillic + CJK)
+RUN dnf install -y \
+  google-noto-sans-fonts \
+  google-noto-sans-cjk-ttc-fonts \
+  && fc-cache -fv
 
 # Copy the LaTeX template
 COPY ./src/template.latex template.latex

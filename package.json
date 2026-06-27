@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test:types": "tsc",
-    "test": "yarn test:types",
+    "test:unit": "vitest run",
+    "test": "yarn test:types && yarn test:unit",
     "build": "esbuild index.ts --bundle --minify --sourcemap --platform=node --target=es2020 --outfile=dist/index.js"
   },
   "keywords": [],
@@ -19,6 +20,8 @@
   "devDependencies": {
     "@types/aws-lambda": "^8.10.137",
     "@types/node": "^20.12.2",
-    "esbuild": "^0.20.2"
+    "esbuild": "^0.20.2",
+    "typescript": "^6.0.3",
+    "vitest": "^2"
   }
 }

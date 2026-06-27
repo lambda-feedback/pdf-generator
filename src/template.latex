@@ -33,6 +33,8 @@ $if(euro)$
 $endif$
 $if(mainfont)$
     \setmainfont[$for(mainfontoptions)$$mainfontoptions$$sep$,$endfor$]{$mainfont$}
+$else$
+    \setmainfont{Noto Sans}
 $endif$
 $if(sansfont)$
     \setsansfont[$for(sansfontoptions)$$sansfontoptions$$sep$,$endfor$]{$sansfont$}
@@ -43,10 +45,8 @@ $endif$
 $if(mathfont)$
     \setmathfont(Digits,Latin,Greek)[$for(mathfontoptions)$$mathfontoptions$$sep$,$endfor$]{$mathfont$}
 $endif$
-$if(CJKmainfont)$
-    \usepackage{xeCJK}
-    \setCJKmainfont[$for(CJKoptions)$$CJKoptions$$sep$,$endfor$]{$CJKmainfont$}
-$endif$
+\usepackage{xeCJK}
+\setCJKmainfont[$for(CJKoptions)$$CJKoptions$$sep$,$endfor$]{$if(CJKmainfont)$$CJKmainfont$$else$Noto Sans CJK KR$endif$}
 \fi
 % use upquote if available, for straight quotes in verbatim environments
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
@@ -260,8 +260,8 @@ $endif$
 
 
 \usepackage[a4paper,top=2cm,bottom=2cm,left=2cm,right=2cm]{geometry}%
-\usepackage{lmodern}%                     font style must be sans serif to comply with
-\renewcommand*\familydefault{\sfdefault}% the college's regulations with respect to disabilities!
+% Noto Sans (sans-serif) is set as the default mainfont above, satisfying the
+% college's accessibility requirement for sans-serif fonts throughout the document.
 
 
 \begin{document}
