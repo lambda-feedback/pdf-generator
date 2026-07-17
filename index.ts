@@ -6,6 +6,12 @@ import { deleteFile, errorRefiner } from "./src/utils";
 import { z } from "zod";
 
 const TypeOfFileSchema = z.enum(["PDF", "TEX"]);
+const TemplateSchema = z.enum(["default", "cjk"]);
+
+const templatePaths: Record<z.infer<typeof TemplateSchema>, string> = {
+  default: "./templates/default.latex",
+  cjk: "./templates/cjk.latex",
+};
 
 export const schema = z.array(
   z.object({
@@ -15,6 +21,7 @@ export const schema = z.array(
     markdown: z.string(),
     implicitFigures: z.boolean().optional(),
     variables: z.record(z.string(), z.string()).optional(),
+    template: TemplateSchema.optional(),
   })
 );
 
@@ -150,13 +157,14 @@ export const handler = async function (
     const implicitFigures = eachRequestData.implicitFigures;
     const variableArgs = Object.entries(eachRequestData.variables ?? {})
       .map(([k, v]) => `--variable=${k}:${v}`);
+    const templatePath = templatePaths[eachRequestData.template ?? "default"];
 
     switch (eachRequestData.typeOfFile) {
       case "PDF":
         const filenamePDF = `${eachRequestData.fileName}.pdf`;
         const localPathPDF = `/tmp/${filenamePDF}`;
         const generatePDFResult = await generateFile(
-          ["--pdf-engine=xelatex", `--template=./template.latex`, ...variableArgs],
+          ["--pdf-engine=xelatex", `--template=${templatePath}`, ...variableArgs],
           localPathPDF,
           markdown,
           implicitFigures
@@ -173,7 +181,7 @@ export const handler = async function (
         const filenameTEX = `${eachRequestData.fileName}.tex`;
         const localPathTEX = `/tmp/${filenameTEX}`;
         await generateFile(
-          [`--template=./template.latex`, ...variableArgs],
+          [`--template=${templatePath}`, ...variableArgs],
           localPathTEX,
           markdown,
           implicitFigures
