@@ -62,6 +62,21 @@ describe("schema", () => {
     const data = [{ userId: "u1", fileName: "doc", typeOfFile: "PDF", markdown: "text", variables: { lang: 42 } }];
     expect(schema.safeParse(data).success).toBe(false);
   });
+
+  it("validates a request with template \"default\"", () => {
+    const data = [{ userId: "u1", fileName: "doc", typeOfFile: "PDF", markdown: "text", template: "default" }];
+    expect(schema.safeParse(data).success).toBe(true);
+  });
+
+  it("validates a request with template \"cjk\"", () => {
+    const data = [{ userId: "u1", fileName: "doc", typeOfFile: "PDF", markdown: "text", template: "cjk" }];
+    expect(schema.safeParse(data).success).toBe(true);
+  });
+
+  it("rejects an unknown template value", () => {
+    const data = [{ userId: "u1", fileName: "doc", typeOfFile: "PDF", markdown: "text", template: "korean" }];
+    expect(schema.safeParse(data).success).toBe(false);
+  });
 });
 
 describe("handler", () => {
@@ -115,6 +130,28 @@ describe("handler", () => {
     const calledArgs: string[] = executeMock.mock.calls[0]?.[0]?.pandocArgs ?? [];
     expect(calledArgs).toContain("--variable=lang:ko");
     expect(calledArgs).toContain("--variable=CJKmainfont:Noto Sans CJK KR");
+  });
+
+  it("uses the default template when template is omitted", async () => {
+    const executeMock = vi.fn().mockResolvedValue("");
+    vi.mocked(PdcTs).mockImplementationOnce(() => ({ Execute: executeMock }) as any);
+
+    const event = [{ userId: "user1", fileName: "test-doc", typeOfFile: "TEX", markdown: "# Hello" }];
+    await handler(event as any);
+
+    const calledArgs: string[] = executeMock.mock.calls[0]?.[0]?.pandocArgs ?? [];
+    expect(calledArgs).toContain("--template=./templates/default.latex");
+  });
+
+  it("uses the cjk template when template is \"cjk\"", async () => {
+    const executeMock = vi.fn().mockResolvedValue("");
+    vi.mocked(PdcTs).mockImplementationOnce(() => ({ Execute: executeMock }) as any);
+
+    const event = [{ userId: "user1", fileName: "test-doc", typeOfFile: "TEX", markdown: "# Hello", template: "cjk" }];
+    await handler(event as any);
+
+    const calledArgs: string[] = executeMock.mock.calls[0]?.[0]?.pandocArgs ?? [];
+    expect(calledArgs).toContain("--template=./templates/cjk.latex");
   });
 
   it("returns 500 when Pandoc execution fails", async () => {

@@ -52,8 +52,8 @@ RUN dnf install -y \
   google-noto-sans-cjk-ttc-fonts \
   && fc-cache -fv
 
-# Copy the LaTeX template
-COPY ./src/template.latex template.latex
+# Copy the LaTeX templates
+COPY ./src/templates ./templates
 
 # Copy built files from the previous stage
 COPY --from=builder /app/dist/* ./
