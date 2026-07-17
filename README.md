@@ -51,6 +51,37 @@ body:
 ]
 ```
 
+### Request fields
+
+| Field | Required | Description |
+|---|---|---|
+| `userId` | Yes | Used to namespace the generated file in S3 |
+| `fileName` | Yes | Output file name, without extension |
+| `typeOfFile` | Yes | `"PDF"` or `"TEX"` |
+| `markdown` | Yes | Source document body |
+| `implicitFigures` | No | Enables Pandoc's `implicit_figures` extension |
+| `variables` | No | Map of Pandoc template variables, passed as `--variable=key:value` |
+| `template` | No | `"default"` or `"cjk"` (see below). Defaults to `"default"` |
+
+### Templates
+
+Two LaTeX templates are available via the `template` field:
+
+- `"default"` (default) — the standard document template, sans-serif `lmodern` font.
+- `"cjk"` — adds `xeCJK` support for Chinese/Japanese/Korean typesetting, with `Noto Sans` / `Noto Sans CJK KR` as the default fonts. Use this when the document contains CJK text. `mainfont`/`CJKmainfont` can still be overridden via `variables`.
+
+```json
+[
+    {
+        "userId":"c82da7d4-3295-4c4a-921b-7000d65224b6",
+        "fileName": "korean_doc",
+        "typeOfFile":"PDF",
+        "template":"cjk",
+        "markdown":"# 수학 문서\n\n이차 방정식의 판별식은 $\\Delta = b^2 - 4ac$ 입니다."
+    }
+]
+```
+
 
 ## Testing
 
